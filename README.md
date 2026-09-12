@@ -1,11 +1,14 @@
 # 🤟 SIGNMIND — AI Sign Language Movement Debugger & Learning Game
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-signmind.vercel.app-00f5a0?style=for-the-badge&logo=vercel&logoColor=black)](https://signmind.vercel.app/)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&style=flat-square)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript&style=flat-square)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-purple?logo=vite&style=flat-square)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&style=flat-square)](https://tailwindcss.com/)
 [![MediaPipe](https://img.shields.io/badge/MediaPipe-Tasks_Vision-brightgreen?logo=google&style=flat-square)](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+
+> 🌐 **Live Prototype**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)** — *Try the interactive camera movement debugger directly in your browser.*
 
 > **Develop a gamified learning platform that helps users learn sign language through interactive challenges and camera-based gesture recognition. The system provides real-time feedback on hand gestures, tracks learning progress, and makes sign-language practice engaging and accessible.**
 
