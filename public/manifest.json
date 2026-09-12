@@ -1,0 +1,18 @@
+{
+  "name": "SIGNMIND — AI Sign Coach",
+  "short_name": "SIGNMIND",
+  "description": "Gamified AI-powered sign-language learning with real-time movement debugging.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f131c",
+  "theme_color": "#0f131c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/emblem.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
