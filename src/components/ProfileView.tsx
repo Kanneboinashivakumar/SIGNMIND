@@ -99,7 +99,7 @@ export const ProfileView: React.FC = () => {
   const hasFirstSignCleared = completedLessons.length >= 1;
   const totalCoreLessons = 6;
   const completedCoreCount = lessons.filter(
-    (l) => l.world === 1 && l.id !== 'w1-restaurant' && (l.status === 'completed' || l.status === 'perfect')
+    (l) => l.world === 1 && l.id !== 'quest-restaurant' && l.signName !== 'RESTAURANT QUEST' && (l.status === 'completed' || l.status === 'perfect')
   ).length;
 
   const bestAccuracy = Math.max(
@@ -112,7 +112,7 @@ export const ProfileView: React.FC = () => {
 
   const isQuestCleared = lessons.some(
     (l) =>
-      (l.id === 'w1-restaurant' || l.signName === 'RESTAURANT QUEST') &&
+      (l.id === 'quest-restaurant' || l.signName === 'RESTAURANT QUEST') &&
       (l.status === 'completed' || l.status === 'perfect' || (l.accuracyPercent || 0) >= 70)
   );
 

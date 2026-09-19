@@ -53,7 +53,7 @@ export const MissionsView: React.FC = () => {
         </p>
       </div>
 
-      {/* 5 Core Signs Checklist */}
+      {/* 6 Core Signs Checklist */}
       <div className="flex flex-col gap-2">
         {SIGN_ORDER.map((name) => {
           const lesson = lessons.find((l) => l.signName === name);

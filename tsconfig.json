@@ -1,4 +1,5 @@
 {
+  /* SIGNMIND Solution Root TypeScript Project */
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

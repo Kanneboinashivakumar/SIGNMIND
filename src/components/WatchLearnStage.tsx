@@ -29,64 +29,64 @@ const SIGN_PEDAGOGY: Record<string, SignGuideInfo> = {
       'Finish the stroke cleanly before relaxing your arm.'
     ]
   },
-  'HOW ARE YOU': {
-    handShape: 'Starts with Index Point (1-finger), transitioning fluidly into Open 5-Hand (all fingers extended and spread).',
-    orientation: 'Finger points forward → rotates into open palm facing upward near chest level.',
-    startingPosition: 'Dominant hand extended forward, pointing directly toward the other person.',
-    movementPath: 'Arc the hand inward toward your lower chest while opening fingers, finishing with an upward-facing questioning open palm.',
-    culturalNote: 'As an open-ended WH/general question, tilt your head slightly forward and furrow your brows slightly to signal inquiry in ASL.',
+  'THANK YOU': {
+    handShape: 'Open flat B-hand with all four fingers straight together and thumb resting gently at the side.',
+    orientation: 'Fingertips point to chin/lips with palm facing toward your face, transitioning outward toward your partner.',
+    startingPosition: 'Tips of extended fingers lightly touching or hovering just in front of your chin and lower lip.',
+    movementPath: 'Move hand smoothly forward and slightly downward toward your conversation partner in a warm, open arc.',
+    culturalNote: 'Do not hurry this gesture; a respectful slight nod and a pleasant facial expression communicate authentic gratitude.',
     proTips: [
-      'Ensure the transition from point to open palm is continuous and fluid.',
-      'Add a very subtle upward pulse at the end to emphasize the question.',
-      'Keep your opposite hand relaxed or at your side.'
+      'Keep fingers straight and held together like a flat paddle.',
+      'The movement originates from the elbow and wrist, extending comfortably outward.',
+      'Ensure the hand moves forward toward the person you are thanking, not down toward the floor.'
     ]
   },
-  'I AM FINE': {
-    handShape: 'Open 5-hand with all five fingers spread wide and thumb fully extended.',
-    orientation: 'Palm faces across your torso toward the non-dominant side.',
-    startingPosition: 'Thumb tip positioned in front of or lightly touching the center of your chest (sternum).',
-    movementPath: 'Touch thumb to chest, tap once or twice gently, and sweep slightly forward with confidence.',
-    culturalNote: 'The sign FINE conveys contentment and casual comfort. Smile slightly and nod to reinforce the positivity.',
+  PLEASE: {
+    handShape: 'Flat open B-hand with palm flat and all fingers extended and together.',
+    orientation: 'Palm facing directly against your chest with fingers pointing slightly diagonally upward.',
+    startingPosition: 'Dominant hand resting flat against the center of your chest/sternum.',
+    movementPath: 'Rub your hand in a gentle, continuous clockwise circular motion across your chest twice.',
+    culturalNote: 'PLEASE reflects humble courtesy in ASL. A soft, welcoming smile reinforces the politeness of your request.',
     proTips: [
-      'Make sure the thumb clearly makes contact or hovers directly over the sternum.',
-      'Do not curl the other four fingers; keep the open "5" spread distinct.',
-      'A relaxed outward movement completes the sign naturally.'
+      'Keep your palm flat against your chest throughout the entire circular path.',
+      'Make smooth circular sweeps rather than jerky linear motions.',
+      'Two small revolutions at natural conversational pace are ideal.'
     ]
   },
-  "WHAT'S YOUR NAME": {
-    handShape: 'ASL "H" handshape — index and middle fingers extended together, ring and pinky curled into palm under thumb.',
-    orientation: 'Fingers horizontal, palm facing toward yourself / slightly angled.',
-    startingPosition: 'Hands in front of chest at mid-torso height.',
-    movementPath: 'Tap the extended index and middle fingers together twice (NAME), then extend dominant index forward (YOUR).',
-    culturalNote: 'Furrow your brows when asking "What\'s your name?" — in ASL grammar, WH-questions require furrowed eyebrows.',
+  SORRY: {
+    handShape: 'ASL "A" handshape — fingers curled into a neat fist with the thumb resting straight alongside the index finger.',
+    orientation: 'Knuckles facing outward and palm-side of the fist resting against the center of your chest.',
+    startingPosition: 'Dominant fist placed over the sternum in the center of your chest.',
+    movementPath: 'Rub your fist in a circular motion on your chest, tracing two steady circles.',
+    culturalNote: 'In ASL grammar, facial expression gives SORRY its weight — an apologetic or remorseful look conveys genuine apology.',
     proTips: [
-      'Keep index and middle fingers pressed tightly together like a single paddle.',
-      'The double-tap for NAME should be light, crisp, and rhythmic.',
-      'Point cleanly forward on YOUR without dropping your arm too early.'
+      'Make sure your thumb rests alongside the index finger rather than tucked under.',
+      'Maintain continuous contact with your chest as the fist circles.',
+      'Do not move too quickly; keep the movement controlled and sincere.'
     ]
   },
-  'MY NAME IS': {
-    handShape: 'Starts with index point to self, then transitions to ASL "H" handshape (index + middle fingers extended).',
-    orientation: 'Self point touches chest; H-hand fingers tap horizontally with palm facing torso.',
-    startingPosition: 'Dominant index finger touching center of chest (MY).',
-    movementPath: 'Point to chest (MY) → switch to H-hand and tap fingers together twice (NAME).',
-    culturalNote: 'Follow this immediately by fingerspelling your name with clear letters at shoulder height.',
+  YES: {
+    handShape: 'ASL "S" handshape — a firm closed fist with the thumb curled across the front of the fingers.',
+    orientation: 'Knuckles facing forward/outward toward the camera, thumb side facing upward.',
+    startingPosition: 'Dominant fist held comfortably in neutral signing space at chest/shoulder level.',
+    movementPath: 'Nod the fist up and down from the wrist, bending downward and releasing up twice like a head nod.',
+    culturalNote: 'Nod your head in sync with the hand motion to naturally reinforce the affirmative meaning.',
     proTips: [
-      'Point directly to the center of your own chest for clarity.',
-      'Maintain an upright posture so your hand shapes are clearly visible in the signing space.',
-      'Keep the H-hand double tap crisp and distinct.'
+      'The nod is purely wrist flexion — do not move your entire arm up and down.',
+      'Two crisp nods create the standard conversational ASL cadence.',
+      'Keep your fist upright and fingers neatly closed.'
     ]
   },
-  'NICE TO MEET YOU': {
-    handShape: 'Flat open B-hand on both hands, transitioning to upright index fingers approaching each other.',
-    orientation: 'Dominant palm slides across non-dominant palm facing up; then both index fingers face each other.',
-    startingPosition: 'Non-dominant hand flat, palm up; dominant hand rests on top of it at the wrist (NICE).',
-    movementPath: 'Slide dominant hand smoothly across the other palm (NICE) → bring index fingers toward each other (MEET) → point outward (YOU).',
-    culturalNote: 'This 3-part sequence is the standard polite greeting when meeting someone new in the Deaf community.',
+  NO: {
+    handShape: 'Index and middle fingers extended together, thumb extended outward underneath them like an open beak.',
+    orientation: 'Fingers pointing forward and slightly upward toward your partner, palm angled diagonally.',
+    startingPosition: 'Hand held at mid-chest height in neutral signing space.',
+    movementPath: 'Snap the tips of your index and middle fingers firmly down onto the tip of your thumb twice.',
+    culturalNote: 'A subtle head shake paired with the finger snap reinforces the negation clearly and expressively.',
     proTips: [
-      'NICE: The slide across the palm should be smooth from wrist toward fingertips.',
-      'MEET: Bring the two index fingers together like two people meeting face-to-face.',
-      'YOU: Point directly at your partner to conclude.'
+      'Keep index and middle fingers glued together throughout the snap.',
+      'The snap down onto the thumb should be crisp, definitive, and rhythmic.',
+      'Release slightly after the first snap to execute the second tap cleanly.'
     ]
   },
   'RESTAURANT QUEST': {

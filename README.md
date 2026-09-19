@@ -66,12 +66,12 @@ flowchart TD
 
     subgraph Flow ["4. Progression & Gamification State (Zustand)"]
         H --> I{Score >= 70% ?}
-        I -- "< 70% (Miss)" --> J["Diagnostic AI Coach Feedback<br/>(Identify Priority Issue + Retry)"]
+        I -- "< 70% (Miss)" --> J["Diagnostic Kinematic Coach Feedback<br/>(Identify Priority Issue + Retry)"]
         I -- ">= 70% (Pass)" --> K["Milestone Clear! Confetti & Audio FX<br/>Unlock Next Lesson Node"]
         
         K --> L["SignDNA Radar Matrix"]
         K --> M["Hall of Mastery Trophies<br/>(Claim XP & Gems)"]
-        K --> N["Curriculum Progression<br/>(HELLO -> HOW ARE YOU -> ...)"]
+        K --> N["Curriculum Progression<br/>(HELLO -> THANK YOU -> PLEASE -> SORRY -> YES -> NO)"]
     end
 
     subgraph UI ["5. Presentation Layer"]
@@ -87,28 +87,37 @@ flowchart TD
 ## ✨ Core Features
 
 ### 1. 🎥 Watch & Learn Stage
-Before camera capture begins, learners watch isolated, authentic video demonstration clips cut specifically for each sign (`HELLO`, `HOW ARE YOU`, `I AM FINE`, `WHAT'S YOUR NAME`, `MY NAME IS`, `NICE TO MEET YOU`). Numbered anatomical cues walk the learner through hand posture and orientation.
+Before camera capture begins, learners watch isolated, authentic video demonstration clips cut specifically for each sign (`HELLO`, `THANK YOU`, `PLEASE`, `SORRY`, `YES`, `NO`). Numbered anatomical cues walk the learner through hand posture and orientation.
 
-### 2. ⚡ Real-Time Camera Studio & 21-Point Skeletal HUD
-Once in practice mode, SIGNMIND renders an ultra-responsive neon green skeletal hand overlay across the 21 MediaPipe landmark vectors with zero latency. 
+### 2. 🚦 Dynamic Camera Readiness & Pre-Flight Check
+Before entering practice mode, SIGNMIND performs real-time pre-flight checks on lighting, camera framing, and hand tracking stability to ensure ideal recording conditions before user attempts begin.
 
-### 3. 🩺 The Movement Debugger
-Live biometric telemetry continuously monitors:
-- **Wrist Angles**: Real-time Yaw, Pitch, and Roll degrees.
-- **5-Finger Extension/Curl**: Individual progress meters tracking Thumb, Index, Middle, Ring, and Pinky flex.
-- **5 Evaluation Dimensions**: Hand Shape, Position, Orientation, Trajectory (DTW), and Timing.
+### 3. ⚡ Real-Time Camera Studio & 21-Point Skeletal HUD
+Once in practice mode, SIGNMIND renders an interactive skeletal hand overlay across 21 MediaPipe landmark vectors with smooth, real-time performance (~30 FPS).
 
-### 4. 🎯 70% Passing Threshold & Progression
-Attempts scoring below 70% offer targeted AI diagnosis without advancing. Once an attempt clears $\ge 70\%$, celebrations trigger, XP/Gems are banked, and a direct **`Move to Next Sign`** shortcut unlocks.
+### 4. 🩺 The 5-Dimension Movement Debugger
+Deconstructs every attempt across five biomechanical dimensions:
+- **Hand Shape (25%)**: Finger curls and extension across all five digits.
+- **Spatial Position (20%)**: Hand coordinates relative to the face and torso.
+- **Wrist Orientation (25%)**: Real-time Yaw, Pitch, and Roll angles.
+- **Motion Trajectory (18%)**: Dynamic Time Warping (DTW) path alignment against canonical references.
+- **Execution Timing (12%)**: Cadence, rhythm, and motion duration.
 
-### 5. 🧬 SignDNA Profile & Analytics
-Visualizes muscle memory and kinematic divergence on an interactive radar chart, identifying your strongest biomechanical asset and pinpointing where orientation or trajectory needs calibration.
+### 5. 🎯 Fix My Sign — Focused Micro-Drills
+When an attempt falls short or reveals a specific weak dimension (<82%), the system pinpoints the weakest metric, provides actionable kinematic coaching instructions, and lets the user run a focused retry drill. When all metrics are $\ge 82\%$, it celebrates technical mastery.
 
-### 6. 🏆 Hall of Mastery & Gamification
-- **Streaks & Altitude**: Daily active practice tracking and climbing elevation on Mastery Mountain.
-- **Claimable Trophies**: Trophies such as *First Sign Cleared* and *Kinematic Master* unlock dynamically and allow claiming Gems and XP.
+### 6. 📊 Before vs After Attempt Comparison
+Learners can compare their latest attempt against their previous attempt side-by-side, visualizing metric deltas (+/- score changes) to track muscle memory progress over time.
+
+### 7. 🧬 SignDNA Profile & Biometric Radar
+Aggregates continuous practice telemetry into a 5-axis kinematic radar chart, identifying natural biomechanical strengths and pinpointing dimensions needing calibration.
+
+### 8. 🏆 Mastery Progression & Gamification
+- **70% Passing Threshold**: Clear progression requirements to advance through sequential curriculum nodes.
+- **Mastery Journey**: Climb elevation on Mastery Mountain with daily practice streaks.
+- **Claimable Trophies**: Unlock achievements (e.g., *First Sign Cleared*, *Kinematic Master*) to earn XP and Gems.
 - **Cosmetic Wardrobe**: Equip custom hand particle trails (Neon Mint, Electric Violet, Medic Pulse, Solar Plasma).
-- **1-Click Pitch Reset**: A dedicated `RESET DEMO` button in the header resets the curriculum to `HELLO` for rapid live pitching.
+- **1-Click Pitch Reset**: A dedicated `RESET DEMO` button in the header resets the curriculum to `HELLO` for demonstration purposes.
 
 ---
 
@@ -120,6 +129,7 @@ Visualizes muscle memory and kinematic divergence on an interactive radar chart,
 | **Build Tool** | Vite 8 | Sub-second HMR, optimized production rollup |
 | **Styling** | Tailwind CSS | Modern cybernetic dark-mode UI with fluid layouts |
 | **Computer Vision** | Google MediaPipe Tasks-Vision | In-browser 21 3D hand landmark detection |
+| **Kinematic Engine** | Custom Vector Math + DTW | 3D Euler angles, finger curl geometry, dynamic time warping |
 | **State Management**| Zustand | Lightweight persisted store with localStorage syncing |
 | **Audio Engine** | Web Audio API | Low-latency synthesized biometric audio feedback |
 | **FX & Animation** | Canvas-Confetti + CSS | Reward particle systems and HUD glow animations |
@@ -139,17 +149,21 @@ SIGNMIND/
 │       ├── SL.mp4                # Source video for Restaurant Quest
 │       └── clips/                # Standalone cut clips per sign
 │           ├── HELLO.mp4
-│           ├── HOW_ARE_YOU.mp4
-│           ├── I_AM_FINE.mp4
-│           ├── MY_NAME_IS.mp4
-│           ├── NICE_TO_MEET_YOU.mp4
-│           └── WHATS_YOUR_NAME.mp4
+│           ├── NO.mp4
+│           ├── PLEASE.mp4
+│           ├── SORRY.mp4
+│           ├── THANK_YOU.mp4
+│           └── YES.mp4
 ├── src/
 │   ├── components/
+│   │   ├── AttemptComparison.tsx # Before vs After attempt metric diffing
 │   │   ├── BottomNav.tsx         # Mobile navigation bar
+│   │   ├── CameraReadinessCard.tsx # Pre-flight camera readiness checklist
+│   │   ├── FixMySignCard.tsx     # Corrective micro-drills for weakest metric
 │   │   ├── Header.tsx            # Top nav, audio toggle, RESET DEMO, XP widget
 │   │   ├── HomeDashboard.tsx     # Hero overview & daily quest gateway
 │   │   ├── JourneyMap.tsx        # Visual node-based sign progression path
+│   │   ├── MetricComparisonRow.tsx # Metric breakdown comparison rows
 │   │   ├── MissionsView.tsx      # Multi-phrase conversational scenario challenges
 │   │   ├── PracticeStudio.tsx    # Core camera workspace, debugger, modal
 │   │   ├── ProfileView.tsx       # Trophies, trail wardrobe, altitude tracking
@@ -164,7 +178,7 @@ SIGNMIND/
 │   │   ├── progress.ts           # Streak and lesson calculation utilities
 │   │   └── useSignMindStore.ts   # Zustand root store with persistent state
 │   ├── vision/
-│   │   ├── coach.ts              # Rule-based AI coaching templates
+│   │   ├── coach.ts              # Biomechanical coaching templates
 │   │   ├── diagnosis.ts          # Priority issue divergence analysis
 │   │   ├── drawHand.ts           # Canvas skeletal rendering & visual cues
 │   │   ├── dtw.ts                # Dynamic Time Warping trajectory comparison

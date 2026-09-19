@@ -8,7 +8,7 @@ import {
   palmNormal,
   scoreFromError
 } from './geometry';
-import type { LandmarkFrame, MetricScores, TimedFrame } from './types';
+import type { LandmarkFrame, MetricScores, TimedFrame, Vec3 } from './types';
 
 function frameDist(a: LandmarkFrame, b: LandmarkFrame): number {
   // Compare landmark configurations invariant to horizontal mirror inversion
@@ -36,6 +36,13 @@ export function trackingQuality(user: LandmarkFrame | null, recent: LandmarkFram
   jitter /= recent.length - 1;
   const stable = scoreFromError(jitter, 0.08);
   return Math.round(0.5 * 100 + 0.5 * stable);
+}
+
+function robustDist(a: Vec3, b: Vec3): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  const dz = (a.z - b.z) * 0.35;
+  return Math.hypot(dx, dy, dz);
 }
 
 export function scoreAttempt(userFrames: TimedFrame[], reference: TimedFrame[]): MetricScores {
@@ -69,27 +76,30 @@ export function scoreAttempt(userFrames: TimedFrame[], reference: TimedFrame[]):
     for (let i = 0; i < k; i++) ae += Math.abs(ua[i] - ra[i]);
     shapeErr += k ? ae / k : 1;
 
-    // Position error: check both direct and horizontally mirrored reference
+    // Position error: check both direct and horizontally mirrored reference with scaled monocular depth
     const uWrist = uLm[0];
     const rWrist = rLm[0];
     const rWristMirrored = { x: 1 - rWrist.x, y: rWrist.y, z: rWrist.z };
-    const dDirect = dist(uWrist, rWrist);
-    const dMirr = dist(uWrist, rWristMirrored);
+    const dDirect = robustDist(uWrist, rWrist);
+    const dMirr = robustDist(uWrist, rWristMirrored);
     posErr += Math.min(dDirect, dMirr);
 
-    // Orientation error: check both direct and mirrored normals
+    // Orientation error: plane-aligned normal dot product (invariant to 180° front/back flips on edge-on hand)
     const un = palmNormal(uLm);
     const rn = palmNormal(rLm);
     const rnMirr = { x: -rn.x, y: rn.y, z: rn.z };
-    const errDirect = Math.acos(Math.max(-1, Math.min(1, dot(normalize(un), normalize(rn)))));
-    const errMirr = Math.acos(Math.max(-1, Math.min(1, dot(normalize(un), normalize(rnMirr)))));
+    const unNorm = normalize(un);
+    const rnNorm = normalize(rn);
+    const rnMirrNorm = normalize(rnMirr);
+    const errDirect = Math.acos(Math.max(-1, Math.min(1, Math.abs(dot(unNorm, rnNorm)))));
+    const errMirr = Math.acos(Math.max(-1, Math.min(1, Math.abs(dot(unNorm, rnMirrNorm)))));
     orientErr += Math.min(errDirect, errMirr);
   }
   const n = aligned.path.length || 1;
-  const handShape = scoreFromError(shapeErr / n, 1.1);
-  // Realistic threshold for position (0.55 normalized space gives natural webcam variation allowance)
+  const handShape = scoreFromError(shapeErr / n, 1.15);
+  // Realistic threshold for position allowance
   const position = scoreFromError(posErr / n, 0.55);
-  const orientation = scoreFromError(orientErr / n, Math.PI * 0.7);
+  const orientation = scoreFromError(orientErr / n, Math.PI * 0.5);
 
   // Trajectory: Relative displacement arc (delta from first frame) to reward natural gesture motion
   const userStart = user[0].landmarks[0];
@@ -110,17 +120,17 @@ export function scoreAttempt(userFrames: TimedFrame[], reference: TimedFrame[]):
     z: f.landmarks[0].z - refStart.z
   }));
 
-  const dtwDirect = dtw(deltaUser, deltaRefDirect, dist);
-  const dtwMirr = dtw(deltaUser, deltaRefMirr, dist);
+  const dtwDirect = dtw(deltaUser, deltaRefDirect, robustDist);
+  const dtwMirr = dtw(deltaUser, deltaRefMirr, robustDist);
   const bestDtw = Math.min(dtwDirect.cost, dtwMirr.cost);
   const pathNorm = bestDtw / Math.max(deltaUser.length, deltaRefDirect.length);
-  const trajectory = scoreFromError(pathNorm, 0.35);
+  const trajectory = scoreFromError(pathNorm, 0.38);
 
   let warp = 0;
   for (const [ui, ri] of aligned.path) {
     warp += Math.abs(ui / (user.length - 1) - ri / (ref.length - 1));
   }
-  const timing = scoreFromError(warp / n, 0.5);
+  const timing = scoreFromError(warp / n, 0.6);
 
   const overall = Math.round(
     handShape * 0.25 + position * 0.2 + orientation * 0.25 + trajectory * 0.18 + timing * 0.12

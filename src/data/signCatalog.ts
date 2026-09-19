@@ -4,15 +4,10 @@ import type { SignReference, TimedFrame, Vec3 } from '../vision/types';
 
 /* ── Curl presets ────────────────────────────────────────────────────── */
 const OPEN: FingerCurls = [0.15, 0.05, 0.05, 0.08, 0.12];
-const POINT: FingerCurls = [0.55, 0.05, 0.95, 0.95, 0.95];
-const H_SHAPE: FingerCurls = [0.55, 0.05, 0.05, 0.95, 0.95];
 const FIVE: FingerCurls = [0.05, 0.05, 0.05, 0.05, 0.05];
 const FLAT_O: FingerCurls = [0.45, 0.65, 0.65, 0.65, 0.65];
 const THUMBS_UP: FingerCurls = [0.05, 0.95, 0.95, 0.95, 0.95];
-
-function lerpCurls(a: FingerCurls, b: FingerCurls, t: number): FingerCurls {
-  return a.map((v, i) => v + (b[i] - v) * t) as FingerCurls;
-}
+const A_SHAPE: FingerCurls = [0.15, 0.95, 0.95, 0.95, 0.95];
 
 /* ── Sampling helper ────────────────────────────────────────────────── */
 function sample(durationMs: number, fps: number, poseAt: (u: number) => ReturnType<typeof buildHand>): TimedFrame[] {
@@ -43,141 +38,6 @@ function helloFrames(): TimedFrame[] {
   });
 }
 
-/** HOW ARE YOU — Point outward → curve hand toward self with questioning palm-up */
-function howAreYouFrames(): TimedFrame[] {
-  return sample(2000, 30, (u) => {
-    if (u < 0.35) {
-      // Phase 1: Point index finger forward
-      const subU = u / 0.35;
-      const wrist = lerp(v(0.52, 0.45, 0), v(0.60, 0.42, 0.08), subU);
-      const fingers = lerp(v(0.1, -0.9, 0.3), v(0.3, -0.8, 0.4), subU);
-      return pose(wrist, fingers, v(0, 0.1, 1), POINT);
-    } else if (u < 0.7) {
-      // Phase 2: Curve inward — sweep toward chest, opening to flat hand
-      const subU = (u - 0.35) / 0.35;
-      const wrist = lerp(v(0.60, 0.42, 0.08), v(0.50, 0.50, 0), subU);
-      const fingers = lerp(v(0.3, -0.8, 0.4), v(0.05, -0.6, 0.3), subU);
-      const palm = lerp(v(0, 0.1, 1), v(0, 0.5, 0.8), subU);
-      const curls = lerpCurls(POINT, FIVE, subU);
-      return pose(wrist, fingers, palm, curls);
-    } else {
-      // Phase 3: Finish near chest, palm up (questioning)
-      const subU = (u - 0.7) / 0.3;
-      const wrist = lerp(v(0.50, 0.50, 0), v(0.52, 0.52, 0), subU);
-      const bounce = Math.sin(subU * Math.PI) * 0.02;
-      const fingers = v(0.05, -0.5 + bounce, 0.3);
-      return pose(wrist, fingers, v(0, 0.7, 0.6), FIVE);
-    }
-  });
-}
-
-/** I AM FINE — Thumb touches chest → hand opens outward (thumb on chest, open 5 sweeps out) */
-function iAmFineFrames(): TimedFrame[] {
-  return sample(1800, 30, (u) => {
-    if (u < 0.4) {
-      // Phase 1: Thumb touches center chest
-      const subU = u / 0.4;
-      const wrist = lerp(v(0.52, 0.48, 0), v(0.50, 0.52, -0.02), subU);
-      const fingers = lerp(v(0.05, -0.7, 0.2), v(0.05, -0.4, 0.4), subU);
-      return pose(wrist, fingers, v(0, 0.3, 0.9), FIVE);
-    } else if (u < 0.7) {
-      // Phase 2: Tap chest — thumb contacts chest
-      const subU = (u - 0.4) / 0.3;
-      const tap = Math.sin(subU * Math.PI) * 0.015;
-      const wrist = v(0.50, 0.52 + tap, -0.02);
-      return pose(wrist, v(0.05, -0.4, 0.4), v(0, 0.3, 0.9), FIVE);
-    } else {
-      // Phase 3: Open hand sweeps outward and slightly down
-      const subU = (u - 0.7) / 0.3;
-      const wrist = lerp(v(0.50, 0.52, -0.02), v(0.58, 0.56, 0.05), subU);
-      const fingers = lerp(v(0.05, -0.4, 0.4), v(0.2, -0.6, 0.5), subU);
-      const palm = lerp(v(0, 0.3, 0.9), v(0, 0.5, 0.7), subU);
-      return pose(wrist, fingers, palm, FIVE);
-    }
-  });
-}
-
-/** WHAT'S YOUR NAME — H-fingers (index+middle) tap together twice → point outward */
-function whatsYourNameFrames(): TimedFrame[] {
-  return sample(2200, 30, (u) => {
-    if (u < 0.35) {
-      // Phase 1: Form H-hand, first tap (H-fingers cross/tap)
-      const subU = u / 0.35;
-      const tap = Math.sin(subU * Math.PI * 2) * 0.03;
-      const wrist = v(0.50, 0.44 + tap, 0);
-      const fingers = v(0.08 + tap * 0.5, -0.8, 0.15);
-      return pose(wrist, fingers, v(0.1, 0.1, 1), H_SHAPE);
-    } else if (u < 0.65) {
-      // Phase 2: Second tap
-      const subU = (u - 0.35) / 0.3;
-      const tap = Math.sin(subU * Math.PI * 2) * 0.03;
-      const wrist = v(0.50, 0.44 + tap, 0);
-      const fingers = v(0.08 + tap * 0.5, -0.8, 0.15);
-      return pose(wrist, fingers, v(0.1, 0.1, 1), H_SHAPE);
-    } else {
-      // Phase 3: Point outward (YOUR)
-      const subU = (u - 0.65) / 0.35;
-      const wrist = lerp(v(0.50, 0.44, 0), v(0.58, 0.42, 0.08), subU);
-      const fingers = lerp(v(0.08, -0.8, 0.15), v(0.25, -0.85, 0.3), subU);
-      const curls = lerpCurls(H_SHAPE, POINT, subU);
-      return pose(wrist, fingers, v(0.1, 0.1, 1), curls);
-    }
-  });
-}
-
-/** MY NAME IS — Point to self (MY) → H-fingers tap together twice (NAME) */
-function myNameIsFrames(): TimedFrame[] {
-  return sample(2000, 30, (u) => {
-    if (u < 0.3) {
-      // Phase 1: Point to self (MY) — finger touches chest
-      const subU = u / 0.3;
-      const wrist = lerp(v(0.55, 0.45, 0), v(0.50, 0.50, -0.02), subU);
-      const fingers = lerp(v(0.05, -0.7, 0.3), v(0.0, -0.5, 0.2), subU);
-      return pose(wrist, fingers, v(0, 0.2, 1), POINT);
-    } else if (u < 0.65) {
-      // Phase 2: H-fingers first tap (NAME)
-      const subU = (u - 0.3) / 0.35;
-      const tap = Math.sin(subU * Math.PI * 2) * 0.03;
-      const wrist = lerp(v(0.50, 0.50, -0.02), v(0.50, 0.44 + tap, 0), Math.min(1, subU * 2));
-      const fingers = v(0.08 + tap * 0.5, -0.8, 0.15);
-      const curls = lerpCurls(POINT, H_SHAPE, Math.min(1, subU * 3));
-      return pose(wrist, fingers, v(0.1, 0.1, 1), curls);
-    } else {
-      // Phase 3: H-fingers second tap
-      const subU = (u - 0.65) / 0.35;
-      const tap = Math.sin(subU * Math.PI * 2) * 0.03;
-      const wrist = v(0.50, 0.44 + tap, 0);
-      const fingers = v(0.08 + tap * 0.5, -0.8, 0.15);
-      return pose(wrist, fingers, v(0.1, 0.1, 1), H_SHAPE);
-    }
-  });
-}
-
-/** NICE TO MEET YOU — Open hand slides off opposite palm → point outward */
-function niceToMeetYouFrames(): TimedFrame[] {
-  return sample(2000, 30, (u) => {
-    if (u < 0.4) {
-      // Phase 1: NICE — open hand on chest/palm sliding upward
-      const subU = u / 0.4;
-      const wrist = lerp(v(0.48, 0.55, 0), v(0.50, 0.48, 0.02), subU);
-      const fingers = lerp(v(0.05, -0.5, 0.3), v(0.1, -0.7, 0.25), subU);
-      return pose(wrist, fingers, v(0, 0.4, 0.85), OPEN);
-    } else if (u < 0.7) {
-      // Phase 2: MEET — index fingers approach each other
-      const subU = (u - 0.4) / 0.3;
-      const wrist = lerp(v(0.50, 0.48, 0.02), v(0.52, 0.46, 0.04), subU);
-      const fingers = lerp(v(0.1, -0.7, 0.25), v(0.15, -0.85, 0.2), subU);
-      const curls = lerpCurls(OPEN, POINT, subU);
-      return pose(wrist, fingers, v(0.05, 0.15, 1), curls);
-    } else {
-      // Phase 3: YOU — point outward
-      const subU = (u - 0.7) / 0.3;
-      const wrist = lerp(v(0.52, 0.46, 0.04), v(0.60, 0.44, 0.1), subU);
-      const fingers = lerp(v(0.15, -0.85, 0.2), v(0.3, -0.85, 0.35), subU);
-      return pose(wrist, fingers, v(0.05, 0.1, 1), POINT);
-    }
-  });
-}
 
 /** RESTAURANT QUEST — Full 6-phase restaurant conversation (~5.5s) */
 function restaurantQuestFrames(): TimedFrame[] {
@@ -226,11 +86,68 @@ function restaurantQuestFrames(): TimedFrame[] {
   });
 }
 
+/** THANK YOU — Flat open hand from chin moving outward toward partner */
+function thankYouFrames(): TimedFrame[] {
+  return sample(2400, 30, (u) => {
+    const wrist = lerp(v(0.50, 0.42, 0.0), v(0.52, 0.52, -0.05), u);
+    const fingers = lerp(v(0.05, -0.85, 0.0), v(0.1, -0.65, 0.15), u);
+    const palm = lerp(v(0, 0.3, -0.9), v(0, 0.6, 0.8), u);
+    return pose(wrist, fingers, palm, OPEN);
+  });
+}
+
+/** PLEASE — Open flat hand circular rubbing motion on chest */
+function pleaseFrames(): TimedFrame[] {
+  return sample(2600, 30, (u) => {
+    const angle = u * Math.PI * 4;
+    const circleX = Math.cos(angle) * 0.05;
+    const circleY = Math.sin(angle) * 0.05;
+    const wrist = v(0.52 + circleX, 0.50 + circleY, 0.02);
+    const fingers = v(circleX * 0.5, -0.9, 0.1);
+    return pose(wrist, fingers, v(0, 0.2, 0.98), OPEN);
+  });
+}
+
+/** SORRY — A-hand fist circular rubbing motion on chest */
+function sorryFrames(): TimedFrame[] {
+  return sample(2600, 30, (u) => {
+    const angle = u * Math.PI * 4;
+    const circleX = Math.cos(angle) * 0.05;
+    const circleY = Math.sin(angle) * 0.05;
+    const wrist = v(0.52 + circleX, 0.50 + circleY, 0.02);
+    const fingers = v(circleX * 0.4, -0.85, 0.15);
+    return pose(wrist, fingers, v(0, 0.2, 0.98), A_SHAPE);
+  });
+}
+
+/** YES — S-fist in neutral space nodding up and down */
+function yesFrames(): TimedFrame[] {
+  return sample(2200, 30, (u) => {
+    const nod = Math.sin(u * Math.PI * 4) * 0.06;
+    const pitch = Math.sin(u * Math.PI * 4) * 0.25;
+    const wrist = v(0.58, 0.46 + nod, 0.05);
+    const fingers = v(0.05, -0.8 + pitch, 0.25);
+    return pose(wrist, fingers, v(0, 0.15, 0.98), THUMBS_UP);
+  });
+}
+
+/** NO — Extended index & middle fingers snapping down to tap thumb */
+function noFrames(): TimedFrame[] {
+  return sample(2200, 30, (u) => {
+    const snap = Math.pow(Math.sin(u * Math.PI * 4), 2);
+    const fingerCurl = 0.05 + (0.85 - 0.05) * snap;
+    const curls: FingerCurls = [0.45, fingerCurl, fingerCurl, 0.95, 0.95];
+    const wrist = v(0.58, 0.44 + snap * 0.02, 0.05);
+    const fingers = v(0.1, -0.75 + snap * 0.1, 0.35);
+    return pose(wrist, fingers, v(0, 0.2, 0.95), curls);
+  });
+}
+
 /* ══════════════════════════════════════════════════════════════════════
    SIGN ORDER & CATALOG
    ══════════════════════════════════════════════════════════════════════ */
 
-export const SIGN_ORDER = ['HELLO', 'HOW ARE YOU', 'I AM FINE', "WHAT'S YOUR NAME", 'MY NAME IS', 'NICE TO MEET YOU'] as const;
+export const SIGN_ORDER = ['HELLO', 'THANK YOU', 'PLEASE', 'SORRY', 'YES', 'NO'] as const;
 
 export const SIGN_CATALOG: Record<string, SignReference> = {
   HELLO: {
@@ -255,115 +172,115 @@ export const SIGN_CATALOG: Record<string, SignReference> = {
     videoStartTime: 0,
     videoEndTime: 7.8
   },
-  'HOW ARE YOU': {
-    id: 'w1-how-are-you',
-    name: 'HOW ARE YOU',
-    phonetic: '/haʊ ɑːr juː/',
-    meaning: 'Asking about someone\'s wellbeing.',
+  'THANK YOU': {
+    id: 'w1-thank-you',
+    name: 'THANK YOU',
+    phonetic: '/θæŋk juː/',
+    meaning: 'Universal expression of courtesy and gratitude.',
     instructions: [
-      'Point your index finger forward toward the person.',
-      'Curve your hand inward toward your chest while opening to a flat hand.',
-      'End with palm facing up near chest in a questioning gesture.'
+      'Touch your fingertips to your chin with a flat, open hand.',
+      'Move your hand forward and slightly downward toward the person.',
+      'Keep your palm facing toward yourself at the start, tilting outward as you extend.'
     ],
     teachPhases: [
-      { start: 0, end: 0.35, caption: 'Point your index finger forward toward the person you are addressing.' },
-      { start: 0.35, end: 0.7, caption: 'Sweep your hand inward toward your chest. Fingers open gradually from a point to a flat "5" hand.' },
-      { start: 0.7, end: 1, caption: 'Finish with your palm facing up near your chest. Small bounce indicates a question.' }
+      { start: 0, end: 0.35, caption: 'Place the fingertips of your flat open dominant hand against your chin or lips.' },
+      { start: 0.35, end: 0.75, caption: 'Move your hand outward and slightly downward toward the person you are thanking.' },
+      { start: 0.75, end: 1, caption: 'End with your palm angled comfortably upward and outward with a warm smile.' }
     ],
-    icon: 'psychology_alt',
-    durationMs: 4200,
-    frames: howAreYouFrames(),
-    videoUrl: '/videos/clips/HOW_ARE_YOU.mp4',
+    icon: 'volunteer_activism',
+    durationMs: 2400,
+    frames: thankYouFrames(),
+    videoUrl: '/videos/clips/THANK_YOU.mp4',
     videoStartTime: 0,
-    videoEndTime: 8.7
+    videoEndTime: 3.5
   },
-  'I AM FINE': {
-    id: 'w1-i-am-fine',
-    name: 'I AM FINE',
-    phonetic: '/aɪ æm faɪn/',
-    meaning: 'Responding that you are well.',
+  PLEASE: {
+    id: 'w1-please',
+    name: 'PLEASE',
+    phonetic: '/pliːz/',
+    meaning: 'Polite request indicating respect and courtesy.',
     instructions: [
-      'Spread all five fingers (open "5" hand), thumb extended.',
-      'Touch the thumb to the center of your chest.',
-      'Move the hand forward and outward with a confident gesture.'
+      'Place your flat open hand over the center of your chest.',
+      'Keep fingers together and thumb extended comfortably.',
+      'Rub your hand in a gentle clockwise circle over your chest twice.'
     ],
     teachPhases: [
-      { start: 0, end: 0.4, caption: 'Spread all five fingers into an open "5" hand. Bring your thumb toward the center of your chest.' },
-      { start: 0.4, end: 0.7, caption: 'Tap your thumb lightly against your chest — this is the ASL sign for FINE.' },
-      { start: 0.7, end: 1, caption: 'Sweep the open hand outward and slightly down to finish confidently.' }
+      { start: 0, end: 0.3, caption: 'Place your flat open dominant hand flat against the center of your chest.' },
+      { start: 0.3, end: 0.7, caption: 'Move your hand in a smooth, continuous clockwise circle on your chest.' },
+      { start: 0.7, end: 1, caption: 'Complete the circular motion smoothly to emphasize politeness.' }
     ],
-    icon: 'sentiment_satisfied',
-    durationMs: 4000,
-    frames: iAmFineFrames(),
-    videoUrl: '/videos/clips/I_AM_FINE.mp4',
+    icon: 'favorite',
+    durationMs: 2600,
+    frames: pleaseFrames(),
+    videoUrl: '/videos/clips/PLEASE.mp4',
     videoStartTime: 0,
-    videoEndTime: 8.8
+    videoEndTime: 3.5
   },
-  "WHAT'S YOUR NAME": {
-    id: 'w1-whats-your-name',
-    name: "WHAT'S YOUR NAME",
-    phonetic: '/wɒts jɔːr neɪm/',
-    meaning: 'Asking someone\'s name.',
+  SORRY: {
+    id: 'w1-sorry',
+    name: 'SORRY',
+    phonetic: '/ˈsɒri/',
+    meaning: 'Sincere expression of apology or regret.',
     instructions: [
-      'Form an H-hand: extend index and middle fingers, curl the rest.',
-      'Tap your H-fingers together twice (like tapping stacked fingers) — this is NAME.',
-      'Then point your index finger outward — this means YOUR.'
+      'Form an "A" handshape (closed fist with thumb resting alongside index finger).',
+      'Place the knuckles and palm side against the center of your chest.',
+      'Rub your fist in a circular motion on your chest twice.'
     ],
     teachPhases: [
-      { start: 0, end: 0.35, caption: 'Form H-hand (index + middle extended). Tap your two H-fingers together — first tap for NAME.' },
-      { start: 0.35, end: 0.65, caption: 'Second tap of H-fingers together. Keep the shape crisp.' },
-      { start: 0.65, end: 1, caption: 'Transition to a point: extend index finger outward toward the person — YOUR.' }
+      { start: 0, end: 0.3, caption: 'Make a fist with your thumb resting straight against the side of your index finger ("A" handshape).' },
+      { start: 0.3, end: 0.7, caption: 'Place the fist on your chest and rub in a gentle circular motion.' },
+      { start: 0.7, end: 1, caption: 'Convey sincerity with your facial expression as you finish the circle.' }
     ],
-    icon: 'badge',
-    durationMs: 4800,
-    frames: whatsYourNameFrames(),
-    videoUrl: '/videos/clips/WHATS_YOUR_NAME.mp4',
+    icon: 'sentiment_dissatisfied',
+    durationMs: 2600,
+    frames: sorryFrames(),
+    videoUrl: '/videos/clips/SORRY.mp4',
     videoStartTime: 0,
-    videoEndTime: 18.3
+    videoEndTime: 3.5
   },
-  'MY NAME IS': {
-    id: 'w1-my-name-is',
-    name: 'MY NAME IS',
-    phonetic: '/maɪ neɪm ɪz/',
-    meaning: 'Introducing yourself by name.',
+  YES: {
+    id: 'w1-yes',
+    name: 'YES',
+    phonetic: '/jɛs/',
+    meaning: 'Affirmative response signifying agreement or consent.',
     instructions: [
-      'Point your index finger to your own chest — MY.',
-      'Form H-hand (index + middle extended) and tap together — first tap for NAME.',
-      'Tap H-fingers again — second tap for NAME.'
+      'Form an "S" handshape (closed fist with thumb wrapped across fingers).',
+      'Hold your fist in front of your chest at comfortable shoulder height.',
+      'Nod your fist up and down from the wrist, like a head nodding "yes".'
     ],
     teachPhases: [
-      { start: 0, end: 0.3, caption: 'Point to yourself: touch your index finger to your chest — MY.' },
-      { start: 0.3, end: 0.65, caption: 'Transition to H-hand (index + middle). Tap H-fingers together — first tap for NAME.' },
-      { start: 0.65, end: 1, caption: 'Second tap of H-fingers. Keep the H shape clear throughout.' }
+      { start: 0, end: 0.3, caption: 'Form a closed fist with your thumb wrapped comfortably over your fingers.' },
+      { start: 0.3, end: 0.7, caption: 'Flex your wrist up and down smoothly — simulating a nodding head.' },
+      { start: 0.7, end: 1, caption: 'Nod twice with a confident, affirmative rhythm.' }
     ],
-    icon: 'person',
-    durationMs: 4500,
-    frames: myNameIsFrames(),
-    videoUrl: '/videos/clips/MY_NAME_IS.mp4',
+    icon: 'check_circle',
+    durationMs: 2200,
+    frames: yesFrames(),
+    videoUrl: '/videos/clips/YES.mp4',
     videoStartTime: 0,
-    videoEndTime: 13.6
+    videoEndTime: 4.0
   },
-  'NICE TO MEET YOU': {
-    id: 'w1-nice-to-meet-you',
-    name: 'NICE TO MEET YOU',
-    phonetic: '/naɪs tuː miːt juː/',
-    meaning: 'Expressing pleasure at meeting someone.',
+  NO: {
+    id: 'w1-no',
+    name: 'NO',
+    phonetic: '/noʊ/',
+    meaning: 'Negative response indicating refusal, denial, or boundary.',
     instructions: [
-      'NICE: Slide your open dominant hand upward on your opposite flat palm.',
-      'MEET: Bring your index finger toward the other hand\'s index (fingers approaching).',
-      'YOU: Point your index finger outward at the person.'
+      'Extend your index and middle fingers together, with thumb open.',
+      'Hold the hand at upper chest level facing slightly outward.',
+      'Snap index and middle fingers firmly down onto the thumb twice.'
     ],
     teachPhases: [
-      { start: 0, end: 0.4, caption: 'NICE — Open hand slides upward across your palm or chest. Keep fingers flat.' },
-      { start: 0.4, end: 0.7, caption: 'MEET — Index finger approaches the other hand. Fingers come together representing two people meeting.' },
-      { start: 0.7, end: 1, caption: 'YOU — Point index finger outward toward the person you are meeting.' }
+      { start: 0, end: 0.3, caption: 'Extend your index and middle fingers together like a beak, with thumb open underneath.' },
+      { start: 0.3, end: 0.7, caption: 'Snap your index and middle fingertips down to meet the tip of your thumb.' },
+      { start: 0.7, end: 1, caption: 'Release slightly and snap down a second time for a clear, crisp negation.' }
     ],
-    icon: 'handshake',
-    durationMs: 4500,
-    frames: niceToMeetYouFrames(),
-    videoUrl: '/videos/clips/NICE_TO_MEET_YOU.mp4',
+    icon: 'cancel',
+    durationMs: 2200,
+    frames: noFrames(),
+    videoUrl: '/videos/clips/NO.mp4',
     videoStartTime: 0,
-    videoEndTime: 12.0
+    videoEndTime: 4.0
   },
   'RESTAURANT QUEST': {
     id: 'quest-restaurant',

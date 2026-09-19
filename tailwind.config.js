@@ -1,4 +1,8 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * SIGNMIND — Tailwind CSS Configuration
+ * Cybernetic Dark-Mode Design System & Biometric HUD Tokens
+ * @type {import('tailwindcss').Config}
+ */
 export default {
   darkMode: "class",
   content: [

@@ -8,6 +8,9 @@ import type { NavigationTab } from '../types';
 import { WatchLearnStage } from './WatchLearnStage';
 import { VideoReferencePlayer } from './VideoReferencePlayer';
 import { SIGN_ORDER } from '../data/signCatalog';
+import { FixMySignCard } from './FixMySignCard';
+import { AttemptComparison } from './AttemptComparison';
+import { CameraReadinessCard } from './CameraReadinessCard';
 
 const METRICS: { key: MetricKey; title: string }[] = [
   { key: 'handShape', title: 'Hand Shape' },
@@ -52,6 +55,7 @@ const PracticeAttemptUI: React.FC<{
   const e = usePracticeEngine(canvasRef, videoRef);
   const xp = useSignMindStore((s) => s.xp);
   const setTargetSign = useSignMindStore((s) => s.setTargetSign);
+  const attemptsHistory = useSignMindStore((s) => s.attemptsHistory);
   const scores = e.results;
   const displayScores = scores || (e.handDetected ? e.liveMetrics : null);
   const isLive = !scores && e.handDetected;
@@ -63,6 +67,12 @@ const PracticeAttemptUI: React.FC<{
   // Determine next sign in the curriculum sequence
   const currentIdx = SIGN_ORDER.indexOf(e.sign.name as any);
   const nextSign = currentIdx >= 0 && currentIdx < SIGN_ORDER.length - 1 ? SIGN_ORDER[currentIdx + 1] : null;
+
+  // Compute weakest metric key from actual result scores — used by FixMySignCard + AttemptComparison
+  const ALL_METRIC_KEYS: MetricKey[] = ['handShape', 'position', 'orientation', 'trajectory', 'timing'];
+  const weakestKey: MetricKey = scores
+    ? ALL_METRIC_KEYS.reduce((lowest, key) => (scores[key] < scores[lowest] ? key : lowest))
+    : 'handShape';
 
   return (
     <div className="w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop py-unit-md flex flex-col gap-unit-md max-w-[1520px] mx-auto">
@@ -245,6 +255,18 @@ const PracticeAttemptUI: React.FC<{
             endTime={e.sign.videoEndTime}
           />
 
+          {/* FEATURE 3: Camera Pre-Flight Check — driven by real engine state */}
+          <CameraReadinessCard
+            mediaPipeReady={e.mediaPipeReady}
+            cameraReady={e.trackerReady}
+            trackerError={e.trackerError}
+            handDetected={e.handDetected}
+            wristPos={e.wristPos}
+            isPracticing={e.phase === 'countdown' || e.phase === 'go' || e.phase === 'playing' || e.phase === 'scoring'}
+            onStart={e.startAttempt}
+            onRetry={() => window.location.reload()}
+          />
+
           <div className="glass-panel rounded-2xl p-unit-lg flex flex-col gap-unit-md border border-white/10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -331,20 +353,23 @@ const PracticeAttemptUI: React.FC<{
         </div>
       </div>
 
-      {e.modalOpen && e.diagnosis && typeof document !== 'undefined' &&
+      {e.modalOpen && e.diagnosis && scores && typeof document !== 'undefined' &&
         createPortal(
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-background/85 backdrop-blur-xl">
-            <div className="w-full max-w-lg bg-surface-container-low border border-white/10 rounded-3xl p-6 flex flex-col gap-4">
+            <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto bg-surface-container-low border border-white/10 rounded-3xl p-6 flex flex-col gap-4">
+              {/* Header */}
               <div className="flex justify-between items-start">
                 <div>
                   <div className="text-xs text-primary font-bold uppercase">Attempt result</div>
                   <h2 className="text-xl font-extrabold m-0">{e.sign.name} · {e.diagnosis.score}%</h2>
                   {e.tier && <div className="text-secondary font-bold">{e.tier}</div>}
                 </div>
-                <button onClick={() => e.setModalOpen(false)} className="cursor-pointer">
+                <button onClick={() => e.setModalOpen(false)} className="cursor-pointer shrink-0">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
+
+              {/* Diagnosis summary */}
               <p className="text-sm">
                 {e.diagnosis.priorityIssue
                   ? `Priority issue: ${metricLabel(e.diagnosis.priorityIssue)} (${e.diagnosis.allScores[e.diagnosis.priorityIssue]}%).`
@@ -356,6 +381,8 @@ const PracticeAttemptUI: React.FC<{
                 )}
               </p>
               <p className="text-sm text-on-surface-variant">{e.coach}</p>
+
+              {/* Raw metric grid */}
               <div className="grid grid-cols-2 gap-2">
                 {METRICS.map((m) => (
                   <div key={m.key} className="text-xs">
@@ -363,7 +390,27 @@ const PracticeAttemptUI: React.FC<{
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col gap-2 pt-2">
+
+              {/* FEATURE 1: Fix My Sign — driven by real scores + coach */}
+              <FixMySignCard
+                scores={scores}
+                coach={e.coach}
+                signName={e.sign.name}
+                onRetry={() => {
+                  e.setModalOpen(false);
+                  e.startAttempt();
+                }}
+              />
+
+              {/* FEATURE 2: Before vs After — driven by real attemptsHistory */}
+              <AttemptComparison
+                signId={e.sign.name}
+                attemptsHistory={attemptsHistory}
+                weakestKey={weakestKey}
+              />
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-2 pt-1">
                 {e.diagnosis.score >= 70 ? (
                   <>
                     <div className="p-3 rounded-xl bg-primary-container/20 border border-primary-container/40 flex items-center gap-3">

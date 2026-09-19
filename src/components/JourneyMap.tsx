@@ -63,7 +63,7 @@ export const JourneyMap: React.FC = () => {
                 onClick={() => {
                   setSelectedWorld(1);
                   const w1 = lessons.filter((l) => l.world === 1);
-                  setSelectedNode(w1.find((l) => l.signName === 'THANK YOU') || w1[0]);
+                  setSelectedNode(w1.find((l) => l.signName === 'HELLO') || w1[0]);
                 }}
                 className={`flex items-center gap-unit-xs px-unit-md py-unit-2xs rounded-full transition-all cursor-pointer ${
                   selectedWorld === 1
@@ -380,7 +380,7 @@ export const JourneyMap: React.FC = () => {
             <div className="flex flex-col gap-unit-xs">
               <div className="flex items-baseline justify-between">
                 <h2 className="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
-                  {selectedNode?.signName || 'THANK YOU'}
+                  {selectedNode?.signName || 'HELLO'}
                 </h2>
                 <span className="font-label-code-metric text-label-code-metric text-primary-fixed-dim">
                   MEDIA PIPE 21-PT
@@ -388,7 +388,7 @@ export const JourneyMap: React.FC = () => {
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 {selectedNode?.meaning ||
-                  'Universal expression of courtesy and gratitude. Moves from the chin forward toward the interlocutor.'}
+                  'Friendly greeting acknowledging another person.'}
               </p>
             </div>
 

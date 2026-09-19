@@ -30,6 +30,7 @@ export function usePracticeEngine(
   const [handDetected, setHandDetected] = useState(false);
   const [debugText, setDebugText] = useState('Camera starting…');
   const [trackerReady, setTrackerReady] = useState(false);
+  const [mediaPipeReady, setMediaPipeReady] = useState(false);
   const [trackerError, setTrackerError] = useState<string | null>(null);
   const [fps, setFps] = useState(0);
   const [results, setResults] = useState<MetricScores | null>(null);
@@ -210,17 +211,22 @@ export function usePracticeEngine(
 
         const rWrist = ghost[0];
         const rWristMirr = { x: 1 - rWrist.x, y: rWrist.y, z: rWrist.z };
-        const posErr = Math.min(dist(user[0], rWrist), dist(user[0], rWristMirr));
+        const robustDistLive = (a: Vec3, b: Vec3) =>
+          Math.hypot(a.x - b.x, a.y - b.y, (a.z - b.z) * 0.35);
+        const posErr = Math.min(robustDistLive(user[0], rWrist), robustDistLive(user[0], rWristMirr));
         const livePos = scoreFromError(posErr, 0.55);
 
         const un = palmNormal(user);
         const rn = palmNormal(ghost);
         const rnMirr = { x: -rn.x, y: rn.y, z: rn.z };
+        const unNorm = normalize(un);
+        const rnNorm = normalize(rn);
+        const rnMirrNorm = normalize(rnMirr);
         const orientErr = Math.min(
-          Math.acos(Math.max(-1, Math.min(1, dot(normalize(un), normalize(rn))))),
-          Math.acos(Math.max(-1, Math.min(1, dot(normalize(un), normalize(rnMirr)))))
+          Math.acos(Math.max(-1, Math.min(1, Math.abs(dot(unNorm, rnNorm))))),
+          Math.acos(Math.max(-1, Math.min(1, Math.abs(dot(unNorm, rnMirrNorm)))))
         );
-        const liveOrient = scoreFromError(orientErr, Math.PI * 0.7);
+        const liveOrient = scoreFromError(orientErr, Math.PI * 0.5);
 
         const liveTraj = sync;
         const liveTiming = p === 'playing' ? Math.round(100 * Math.max(0, 1 - Math.abs(phaseProgress - (recordedRef.current.length / Math.max(1, (current.durationMs / 1000) * 30))))) : 85;
@@ -254,6 +260,7 @@ export function usePracticeEngine(
           return;
         }
         landmarkerRef.current = detector;
+        setMediaPipeReady(true); // model loaded — camera permission request follows
         stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
           audio: false
@@ -323,6 +330,7 @@ export function usePracticeEngine(
     handDetected,
     debugText,
     trackerReady,
+    mediaPipeReady,
     trackerError,
     fps,
     results,

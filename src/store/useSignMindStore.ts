@@ -115,14 +115,24 @@ function demoLessons(): LessonNode[] {
   return [...core, bonusLesson];
 }
 
+const VALID_SIGNS = new Set<string>([...SIGN_ORDER, 'RESTAURANT QUEST']);
+
+function sanitizeTargetSign(sign?: string | null): string {
+  if (sign && VALID_SIGNS.has(sign)) return sign;
+  return 'HELLO';
+}
+
 function initLessons(): LessonNode[] {
   if (!persisted?.lessons) return demoLessons();
-  // Check if saved lessons match current SIGN_ORDER — if not, rebuild
+  // Ensure every saved lesson belongs to the valid 6 single-handed signs or restaurant quest
+  const hasInvalidSign = persisted.lessons.some((l) => !VALID_SIGNS.has(l.signName));
+  if (hasInvalidSign) return demoLessons();
+
   const savedNames = new Set(persisted.lessons.map((l) => l.signName));
   const currentNames = SIGN_ORDER.map((n) => SIGN_CATALOG[n]?.name);
   const allMatch = currentNames.every((n) => savedNames.has(n));
   if (!allMatch) return demoLessons();
-  // Ensure restaurant quest exists
+
   const base = demoLessons();
   const quest = base.find((l) => l.signName === 'RESTAURANT QUEST');
   if (quest && !persisted.lessons.some((l) => l.signName === 'RESTAURANT QUEST')) {
@@ -131,10 +141,19 @@ function initLessons(): LessonNode[] {
   return persisted.lessons;
 }
 
-const STORAGE_KEY = 'signmind-demo-pitch-v1';
+const STORAGE_KEY = 'signmind-pure-1hand-v4';
+const LEGACY_STORAGE_KEYS = [
+  'signmind-demo-pitch-v1',
+  'signmind-demo-pitch',
+  'signmind-storage',
+  'signmind_state'
+];
 
 function loadPersisted(): Partial<SignMindState> | null {
   try {
+    for (const key of LEGACY_STORAGE_KEYS) {
+      localStorage.removeItem(key);
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as Partial<SignMindState>;
@@ -181,8 +200,12 @@ export const useSignMindStore = create<SignMindState>((set, get) => ({
     soundManager.playTick();
     set({ activeTab: tab });
   },
-  targetSign: persisted?.targetSign ?? 'HELLO',
-  setTargetSign: (sign) => set({ targetSign: sign }),
+  targetSign: sanitizeTargetSign(persisted?.targetSign),
+  setTargetSign: (sign) => {
+    const safe = sanitizeTargetSign(sign);
+    set({ targetSign: safe });
+    persist();
+  },
   audioEnabled: true,
   toggleAudio: () => {
     const next = !get().audioEnabled;
