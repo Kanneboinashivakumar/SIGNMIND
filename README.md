@@ -1,4 +1,5 @@
-# 🤟 SIGNMIND — AI Sign Language Movement Debugger & Learning Game
+# 🤟 SIGNMIND
+### AI-Powered Sign Language Movement Debugger & Interactive Learning Platform
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-signmind.vercel.app-00f5a0?style=for-the-badge&logo=vercel&logoColor=black)](https://signmind.vercel.app/)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&style=flat-square)](https://react.dev/)
@@ -8,9 +9,9 @@
 [![MediaPipe](https://img.shields.io/badge/MediaPipe-Tasks_Vision-brightgreen?logo=google&style=flat-square)](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-> 🌐 **Live Prototype**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)** — *Try the interactive camera movement debugger directly in your browser.*
+**SIGNMIND** transforms sign language education from passive video watching into an interactive, camera-powered learning experience. Using real-time computer vision and 5-dimensional kinematic movement analysis, SIGNMIND acts as your personal biomechanical coach — evaluating hand shape, wrist orientation, spatial positioning, motion trajectory, and timing right inside your browser with zero specialized hardware.
 
-> **Develop a gamified learning platform that helps users learn sign language through interactive challenges and camera-based gesture recognition. The system provides real-time feedback on hand gestures, tracks learning progress, and makes sign-language practice engaging and accessible.**
+🌐 **Try the Live Application**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)**
 
 ---
 
@@ -27,10 +28,10 @@ Over 70 million deaf individuals worldwide rely on sign language, but learning i
 
 ## 💡 The SIGNMIND Solution
 
-**SIGNMIND** transforms sign language education into an accessible, camera-powered video game:
+**SIGNMIND** transforms sign language education into an accessible, camera-powered interactive experience:
 
 1. **Zero External Hardware**: Runs 100% in any modern web browser using a standard laptop or mobile webcam.
-2. **Clinical Movement Debugger**: Deconstructs every attempt across 5 essential biomechanical dimensions rather than guessing with a black-box model.
+2. **Kinematic Movement Debugger**: Deconstructs every attempt across 5 essential biomechanical dimensions rather than guessing with a black-box model.
 3. **Adaptive 70% Milestone Progression**: Requires verified $\ge 70\%$ accuracy to advance through sequential curriculum nodes.
 4. **SignDNA Biometric Profiling**: Aggregates continuous performance into a personalized muscle-memory radar chart.
 5. **Gamified Motivation**: Leveling, daily practice streaks, milestone trophies, cosmetic particle trails, and interactive scenario quests.
