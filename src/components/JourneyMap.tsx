@@ -34,8 +34,85 @@ export const JourneyMap: React.FC = () => {
     }
   };
 
+  const coreLessons = lessons.filter((l) => l.signName !== 'RESTAURANT QUEST' && l.id !== 'quest-restaurant');
+  const questLesson = lessons.find((l) => l.signName === 'RESTAURANT QUEST' || l.id === 'quest-restaurant');
+  const clearedCore = coreLessons.filter((l) => l.status === 'completed' || l.status === 'perfect').length;
+
   return (
     <div className="flex flex-col w-full">
+
+      {/* ════ MOBILE VERTICAL PATH (< xl) ════ */}
+      <div className="xl:hidden w-full px-4 pt-4 pb-6 flex flex-col gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary-container text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>terrain</span>
+            <span className="font-extrabold text-lg text-on-surface uppercase tracking-tight">MASTERY MOUNTAIN</span>
+          </div>
+          <p className="text-xs text-on-surface-variant mt-0.5">6 signs · Real progress · A more inclusive you.</p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-on-surface-variant">{clearedCore} / 6 lessons completed</span>
+            <span className="text-primary-container font-bold">{Math.round((clearedCore / 6) * 100)}%</span>
+          </div>
+          <div className="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-[#00f5a0] to-[#00e293] rounded-full" style={{ width: `${(clearedCore / 6) * 100}%` }} />
+          </div>
+        </div>
+        <div className="relative flex flex-col gap-0">
+          <div className="absolute left-6 top-6 bottom-6 w-0.5 border-l-2 border-dashed border-surface-container-highest z-0" />
+          {coreLessons.slice(0, 6).map((lesson, idx) => {
+            const isCompleted = lesson.status === 'completed' || lesson.status === 'perfect';
+            const isAvail = lesson.status === 'available' || lesson.status === 'in_progress';
+            const isLocked = lesson.status === 'locked';
+            return (
+              <div key={lesson.id} className="relative z-10 flex items-center gap-4 py-3">
+                <button
+                  disabled={isLocked}
+                  onClick={() => { if (!isLocked) handleStartPractice(lesson); }}
+                  className={`shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-extrabold border-2 transition-all cursor-pointer disabled:cursor-default ${
+                    isCompleted ? 'bg-primary-container border-primary-container text-on-primary-fixed shadow-[0_0_16px_rgba(0,245,160,0.4)]'
+                    : isAvail ? 'bg-surface-container-high border-primary-container text-primary-container shadow-[0_0_20px_rgba(0,245,160,0.3)]'
+                    : 'bg-surface-container border-surface-container-highest text-on-surface-variant'
+                  }`}
+                >
+                  {isLocked ? <span className="material-symbols-outlined text-lg">lock</span>
+                   : isCompleted ? <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                   : <span className="text-sm font-bold">{idx + 1}</span>}
+                </button>
+                <div className="flex flex-col flex-1">
+                  <span className={`font-bold text-base ${isLocked ? 'text-on-surface-variant' : 'text-on-surface'}`}>{lesson.signName}</span>
+                  <span className={`text-xs ${isAvail ? 'text-primary-container' : isCompleted ? 'text-[#00f5a0]' : 'text-on-surface-variant'}`}>
+                    {isCompleted ? `Cleared · ${lesson.accuracyPercent}%` : isAvail ? 'Ready to practice' : 'Locked'}
+                  </span>
+                </div>
+                {(isAvail || isCompleted) && (
+                  <button onClick={() => handleStartPractice(lesson)} className="shrink-0 w-9 h-9 rounded-full bg-primary-container/20 border border-primary-container/40 flex items-center justify-center cursor-pointer">
+                    <span className="material-symbols-outlined text-primary-container text-base" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {questLesson && (
+          <button onClick={() => setActiveTab('missions')} className="w-full rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 flex items-center gap-3 cursor-pointer active:opacity-90">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-amber-400 text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+            </div>
+            <div className="flex flex-col text-left flex-1">
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Bonus Quest</span>
+              <span className="font-bold text-base text-on-surface">Restaurant Scenario</span>
+              <span className="text-xs text-on-surface-variant">Put your skills together in a real 6-phase conversation!</span>
+            </div>
+            <span className="material-symbols-outlined text-amber-400">arrow_forward</span>
+          </button>
+        )}
+      </div>
+
+      {/* ════ DESKTOP (xl+) — UNCHANGED ════ */}
+      <div className="hidden xl:flex xl:flex-col xl:w-full">
+
       {/* Top Mastery Mountain Navigator Bar */}
       <section className="w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop py-unit-md bg-surface-container-low/60 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col gap-unit-md">
@@ -645,6 +722,7 @@ export const JourneyMap: React.FC = () => {
           </div>
         </div>
       )}
+      </div>{/* end xl:flex desktop wrapper */}
     </div>
   );
 };

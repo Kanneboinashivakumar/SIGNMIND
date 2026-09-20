@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SIGNMIND</string>
+    <string name="title_activity_main">SIGNMIND</string>
+    <string name="package_name">com.signmind.app</string>
+    <string name="custom_url_scheme">com.signmind.app</string>
+</resources>

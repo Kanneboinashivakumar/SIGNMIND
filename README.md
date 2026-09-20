@@ -222,11 +222,41 @@ npm run dev
 ```
 Open **`http://localhost:5173`** in your browser. Grant camera permissions when prompted.
 
-### 4. Build for production
+### 4. Build for production (Web)
 ```bash
 npm run build
 ```
 Generates an optimized production bundle in the `dist/` folder.
+
+---
+
+## 📱 Mobile & Android Native Application
+
+SIGNMIND delivers a unified dual-platform experience using a single shared React + TypeScript + Vite codebase:
+- **Responsive Web Application**: Works on any modern mobile and desktop browser.
+- **Installable Android Application**: Packaged using Capacitor (`com.signmind.app`) with full hardware camera access and safe-area notch layout support.
+
+### Android Prerequisites
+- [Android Studio](https://developer.android.com/studio) (Giraffe or newer)
+- Android SDK (API 34+)
+- Java 17 LTS
+
+### Running on Android
+```bash
+# 1. Build web distribution
+npm run build
+
+# 2. Sync web assets & plugins to native Android
+npx cap sync android
+
+# 3. Open project in Android Studio
+npx cap open android
+
+# Or build debug APK directly from command line:
+cd android && ./gradlew assembleDebug
+```
+The compiled debug APK will be located at:
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 

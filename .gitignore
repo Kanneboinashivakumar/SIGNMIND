@@ -34,3 +34,12 @@ dist-ssr
 *.sln
 *.sw?
 Thumbs.db
+
+# Android Local Properties & Build
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.apk
+*.aab
+

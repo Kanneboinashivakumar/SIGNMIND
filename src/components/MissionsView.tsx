@@ -23,7 +23,7 @@ export const MissionsView: React.FC = () => {
   const isQuestCleared = questBest !== null && questBest >= PASS_THRESHOLD;
 
   return (
-    <div className="w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop py-unit-xl max-w-[960px] mx-auto flex flex-col gap-unit-lg">
+    <div className="w-full px-4 md:px-margin-tablet xl:px-margin-desktop py-4 md:py-unit-xl max-w-[960px] mx-auto flex flex-col gap-unit-lg">
       <div>
         <h1 className="font-headline-lg font-extrabold m-0">Missions</h1>
         <p className="text-on-surface-variant text-sm mt-1">

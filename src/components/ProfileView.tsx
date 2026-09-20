@@ -190,7 +190,20 @@ export const ProfileView: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop py-unit-xl flex flex-col gap-unit-2xl max-w-[1440px] mx-auto animate-in fade-in duration-300">
+    <div className="w-full px-4 md:px-margin-tablet xl:px-margin-desktop py-4 md:py-unit-xl flex flex-col gap-unit-lg md:gap-unit-2xl max-w-[1440px] mx-auto animate-in fade-in duration-300">
+      {/* Mobile Navigation Header */}
+      <div className="xl:hidden flex items-center justify-between">
+        <button
+          onClick={() => setActiveTab('home')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold cursor-pointer transition-all border border-white/5"
+        >
+          <span className="material-symbols-outlined text-sm">arrow_back</span>
+          <span>Back</span>
+        </button>
+        <span className="font-bold text-sm text-on-surface uppercase tracking-wider">User Profile</span>
+        <div className="w-12" /> {/* balance spacing */}
+      </div>
+
       {/* 1. PROFILE MASTHEAD HERO */}
       <section className="relative overflow-hidden rounded-2xl bg-surface-container-low p-unit-lg md:p-unit-2xl shadow-xl border border-white/5">
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary-container/10 blur-3xl pointer-events-none"></div>

@@ -21,7 +21,7 @@ export const App: React.FC = () => {
       <Header />
 
       {/* Main Dynamic Viewport */}
-      <main className="relative w-full pt-20 bg-transparent min-h-[calc(100vh-80px)]">
+      <main className="relative w-full pt-0 xl:pt-20 bg-transparent min-h-screen">
         {activeTab === 'home' && <HomeDashboard />}
         {activeTab === 'journey' && <JourneyMap />}
         {activeTab === 'practice' && <PracticeStudio />}

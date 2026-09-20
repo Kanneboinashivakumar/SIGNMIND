@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
   const progressPercent = Math.min(100, Math.round((xp / nextLevelXp) * 100));
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-2xl shadow-[0_1px_16px_rgba(0,0,0,0.4)] border-b border-surface-container-highest/30">
+    <header className="hidden xl:block fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-2xl shadow-[0_1px_16px_rgba(0,0,0,0.4)] border-b border-surface-container-highest/30">
       <div className="h-20 w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop flex items-center justify-between gap-unit-md">
         {/* Brand Logo */}
         <div

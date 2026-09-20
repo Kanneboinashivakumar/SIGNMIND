@@ -32,7 +32,7 @@ export const SignDNAView: React.FC = () => {
   const radarPolygonPoints = `${pShape[0].toFixed(1)},${pShape[1].toFixed(1)} ${pTrajectory[0].toFixed(1)},${pTrajectory[1].toFixed(1)} ${pTiming[0].toFixed(1)},${pTiming[1].toFixed(1)} ${pOrientation[0].toFixed(1)},${pOrientation[1].toFixed(1)} ${pPosition[0].toFixed(1)},${pPosition[1].toFixed(1)}`;
 
   return (
-    <div className="w-full px-margin-mobile md:px-margin-tablet xl:px-margin-desktop py-unit-xl flex flex-col gap-unit-2xl max-w-[1440px] mx-auto">
+    <div className="w-full px-4 md:px-margin-tablet xl:px-margin-desktop py-4 md:py-unit-xl flex flex-col gap-unit-xl md:gap-unit-2xl max-w-[1440px] mx-auto">
       {/* SECTION 1: TOP MASTHEAD & PROFILE SUMMARY */}
       <section className="relative overflow-hidden rounded-2xl bg-surface-container-low p-unit-lg md:p-unit-2xl shadow-xl border border-white/5">
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary-container/10 blur-3xl pointer-events-none"></div>
@@ -155,8 +155,8 @@ export const SignDNAView: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-unit-lg items-start">
-          {/* RADAR SCHEMATIC (5 COLS) */}
-          <div className="lg:col-span-5 bg-surface-container-low rounded-2xl p-unit-lg flex flex-col items-center justify-between shadow-lg relative overflow-hidden border border-white/5">
+          {/* RADAR SCHEMATIC (5 COLS on desktop, appears after progress cards on mobile) */}
+          <div className="order-2 lg:order-1 lg:col-span-5 bg-surface-container-low rounded-2xl p-unit-lg flex flex-col items-center justify-between shadow-lg relative overflow-hidden border border-white/5">
             <div className="w-full flex items-center justify-between font-label-code-metric text-label-code-metric text-on-surface-variant">
               <span className="uppercase font-bold">Vector Distribution</span>
               <span className="text-primary font-bold">ISOMETRIC VIEW</span>
@@ -230,8 +230,8 @@ export const SignDNAView: React.FC = () => {
             </div>
           </div>
 
-          {/* PROGRESS CARDS LIST (7 COLS) */}
-          <div className="lg:col-span-7 flex flex-col gap-unit-sm">
+          {/* PROGRESS CARDS LIST (7 COLS on desktop, appears first on mobile) */}
+          <div className="order-1 lg:order-2 lg:col-span-7 flex flex-col gap-unit-sm">
             {/* Hand Shape (Dominant) */}
             <div className="group relative overflow-hidden bg-surface-container-low hover:bg-surface-container transition-all p-unit-md md:p-unit-lg rounded-2xl shadow-md border border-white/5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-unit-xs mb-unit-xs">
