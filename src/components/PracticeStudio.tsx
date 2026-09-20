@@ -110,6 +110,10 @@ const MobileCameraTab: React.FC<{
           playsInline
           muted
           autoPlay
+          disablePictureInPicture
+          onLoadedMetadata={(evt) => {
+            evt.currentTarget.play().catch(() => {});
+          }}
         />
         <canvas ref={canvasRef} width={720} height={960} className="absolute inset-0 w-full h-full pointer-events-none z-10" />
 
@@ -328,78 +332,91 @@ const PracticeAttemptUI: React.FC<{
   const [mobileTab, setMobileTab] = useState<'camera' | 'tutorial' | 'tips'>('camera');
   const tips = SIGN_TIPS[e.sign.name] || SIGN_TIPS.HELLO;
 
+  // Track viewport so ONLY ONE <video> element is mounted in the DOM
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1280 : false
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia('(min-width: 1280px)');
+    const onChange = (evt: MediaQueryListEvent) => setIsDesktop(evt.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
   return (
     <div className="w-full flex flex-col">
 
       {/* ══════════════════════ MOBILE LAYOUT < xl ══════════════════════ */}
-      <div className="xl:hidden w-full flex flex-col">
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <button onClick={onRewatch} className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center cursor-pointer">
-            <span className="material-symbols-outlined text-on-surface-variant">arrow_back</span>
-          </button>
-          <span className="font-bold text-on-surface text-base">Practice Studio</span>
-          <button onClick={toggleAudio} className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center cursor-pointer">
-            <span className="material-symbols-outlined text-on-surface-variant text-sm">
-              {audioEnabled ? 'volume_up' : 'volume_off'}
-            </span>
-          </button>
-        </div>
+      {!isDesktop && (
+        <div className="w-full flex flex-col">
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-3">
+            <button onClick={onRewatch} className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center cursor-pointer">
+              <span className="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+            </button>
+            <span className="font-bold text-on-surface text-base">Practice Studio</span>
+            <button onClick={toggleAudio} className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center cursor-pointer">
+              <span className="material-symbols-outlined text-on-surface-variant text-sm">
+                {audioEnabled ? 'volume_up' : 'volume_off'}
+              </span>
+            </button>
+          </div>
 
-        {/* Sign banner */}
-        <div className="px-4 pb-3">
-          <div className="rounded-2xl bg-surface-container-low border border-white/5 p-3 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Target Sign</span>
-              <div className="font-extrabold text-2xl text-primary tracking-tight">{e.sign.name}</div>
-              <span className="text-xs text-on-surface-variant">{e.sign.phonetic} · Mirror the tutorial video</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-surface-container-highest px-3 py-1.5 rounded-xl">
-              <span className="text-[10px] text-on-surface-variant font-bold">XP</span>
-              <span className="text-amber-400 font-extrabold font-mono text-sm">{xp}</span>
+          {/* Sign banner */}
+          <div className="px-4 pb-3">
+            <div className="rounded-2xl bg-surface-container-low border border-white/5 p-3 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Target Sign</span>
+                <div className="font-extrabold text-2xl text-primary tracking-tight">{e.sign.name}</div>
+                <span className="text-xs text-on-surface-variant">{e.sign.phonetic} · Mirror the tutorial video</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-surface-container-highest px-3 py-1.5 rounded-xl">
+                <span className="text-[10px] text-on-surface-variant font-bold">XP</span>
+                <span className="text-amber-400 font-extrabold font-mono text-sm">{xp}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Mobile Tabs: Camera / Tutorial / Tips */}
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full">
-            {(['camera', 'tutorial', 'tips'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setMobileTab(tab)}
-                className={`flex-1 py-2 rounded-full text-xs font-bold transition-all cursor-pointer capitalize ${
-                  mobileTab === tab
-                    ? 'bg-surface-container-highest text-primary-container shadow-sm'
-                    : 'text-on-surface-variant'
-                }`}
-              >
-                {tab === 'camera' ? 'Camera' : tab === 'tutorial' ? 'Tutorial' : 'Tips'}
-              </button>
-            ))}
+          {/* Mobile Tabs: Camera / Tutorial / Tips */}
+          <div className="px-4 pb-3">
+            <div className="flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full">
+              {(['camera', 'tutorial', 'tips'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setMobileTab(tab)}
+                  className={`flex-1 py-2 rounded-full text-xs font-bold transition-all cursor-pointer capitalize ${
+                    mobileTab === tab
+                      ? 'bg-surface-container-highest text-primary-container shadow-sm'
+                      : 'text-on-surface-variant'
+                  }`}
+                >
+                  {tab === 'camera' ? 'Camera' : tab === 'tutorial' ? 'Tutorial' : 'Tips'}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Tab content */}
-        <div className="px-4 pb-6">
-          {mobileTab === 'camera' && (
-            <MobileCameraTab
-              e={e}
-              videoRef={videoRef}
-              canvasRef={canvasRef}
-              scores={scores}
-              displayScores={displayScores}
-              isLive={isLive}
-              isCurrentLessonCompleted={!!isCurrentLessonCompleted}
-              nextSign={nextSign}
-              setTargetSign={setTargetSign}
-              setActiveTab={setActiveTab}
-              onRewatch={onRewatch}
-            />
-          )}
+          {/* Tab content — Camera tab kept mounted with CSS display to preserve video element lifecycle */}
+          <div className="px-4 pb-6">
+            <div className={mobileTab === 'camera' ? 'block' : 'hidden'}>
+              <MobileCameraTab
+                e={e}
+                videoRef={videoRef}
+                canvasRef={canvasRef}
+                scores={scores}
+                displayScores={displayScores}
+                isLive={isLive}
+                isCurrentLessonCompleted={!!isCurrentLessonCompleted}
+                nextSign={nextSign}
+                setTargetSign={setTargetSign}
+                setActiveTab={setActiveTab}
+                onRewatch={onRewatch}
+              />
+            </div>
 
-          {mobileTab === 'tutorial' && (
-            <div className="flex flex-col gap-3">
+            <div className={mobileTab === 'tutorial' ? 'flex flex-col gap-3' : 'hidden'}>
               <VideoReferencePlayer
                 signName={e.sign.name}
                 videoUrl={e.sign.videoUrl}
@@ -422,10 +439,8 @@ const PracticeAttemptUI: React.FC<{
                 Go to Camera
               </button>
             </div>
-          )}
 
-          {mobileTab === 'tips' && (
-            <div className="flex flex-col gap-3">
+            <div className={mobileTab === 'tips' ? 'flex flex-col gap-3' : 'hidden'}>
               <div className="rounded-2xl bg-surface-container-low border border-white/5 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="material-symbols-outlined text-amber-400 text-base">tips_and_updates</span>
@@ -454,12 +469,13 @@ const PracticeAttemptUI: React.FC<{
                 Go to Camera
               </button>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ══════════════════════ DESKTOP LAYOUT xl+ ══════════════════════ */}
-      <div className="hidden xl:block w-full px-margin-desktop py-unit-md max-w-[1520px] mx-auto">
+      {isDesktop && (
+        <div className="w-full px-margin-desktop py-unit-md max-w-[1520px] mx-auto">
         <div className="w-full bg-surface-container-low/95 backdrop-blur-2xl rounded-2xl p-unit-md shadow-xl flex flex-wrap items-center justify-between gap-unit-md border border-white/5">
           <div>
             <span className="font-label-code-metric text-on-surface-variant uppercase tracking-wider">Target sign</span>
@@ -564,7 +580,18 @@ const PracticeAttemptUI: React.FC<{
           {/* Center: Camera */}
           <div className="xl:col-span-5 flex flex-col gap-unit-md">
             <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] rounded-2xl overflow-hidden bg-black border border-white/10">
-              <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" style={{ transform: 'scaleX(-1)' }} playsInline muted autoPlay />
+              <video
+                ref={videoRef}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }}
+                playsInline
+                muted
+                autoPlay
+                disablePictureInPicture
+                onLoadedMetadata={(evt) => {
+                  evt.currentTarget.play().catch(() => {});
+                }}
+              />
               <canvas ref={canvasRef} width={1280} height={720} className="absolute inset-0 w-full h-full pointer-events-none z-10" />
               <div className="absolute top-3 left-3 right-3 z-20 font-mono text-[11px] sm:text-xs bg-black/70 text-[#00f5a0] px-3 py-2 rounded-lg border border-[#00f5a0]/30">
                 {e.debugText} · engine {e.fps} fps
@@ -691,6 +718,7 @@ const PracticeAttemptUI: React.FC<{
           </div>
         </div>
       </div>
+      )}
 
       {/* Results Modal (unchanged, works on both mobile and desktop) */}
       {e.modalOpen && e.diagnosis && scores && typeof document !== 'undefined' &&

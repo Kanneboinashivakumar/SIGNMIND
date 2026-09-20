@@ -107,6 +107,8 @@ export function usePracticeEngine(
     setPhase('idle');
   };
 
+  const streamRef = useRef<MediaStream | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     let stream: MediaStream | null = null;
@@ -117,7 +119,28 @@ export function usePracticeEngine(
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const detector = landmarkerRef.current;
-      if (cancelled || !video || !canvas || !detector || video.readyState < 2) return;
+      const currentStream = streamRef.current;
+
+      if (cancelled || !detector) return;
+
+      // Auto-attach stream if video element was mounted or remounted
+      if (video && currentStream && video.srcObject !== currentStream) {
+        video.srcObject = currentStream;
+        video.muted = true;
+        video.defaultMuted = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x5-playsinline', 'true');
+        video.play().catch(() => {});
+      }
+
+      // Resume playback if paused
+      if (video && video.paused && video.srcObject) {
+        video.play().catch(() => {});
+      }
+
+      if (!video || !canvas || video.readyState < 2) return;
 
       const now = performance.now();
       let user: LandmarkFrame | null = null;
@@ -269,9 +292,21 @@ export function usePracticeEngine(
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+        streamRef.current = stream;
+        const v = videoRef.current;
+        if (v) {
+          v.srcObject = stream;
+          v.muted = true;
+          v.defaultMuted = true;
+          v.playsInline = true;
+          v.setAttribute('playsinline', 'true');
+          v.setAttribute('webkit-playsinline', 'true');
+          v.setAttribute('x5-playsinline', 'true');
+          try {
+            await v.play();
+          } catch (playErr) {
+            console.warn('Initial video.play() deferred:', playErr);
+          }
         }
         setTrackerReady(true);
         setTrackerError(null);
@@ -286,6 +321,8 @@ export function usePracticeEngine(
       cancelled = true;
       cancelAnimationFrame(raf);
       stream?.getTracks().forEach((t) => t.stop());
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
       landmarkerRef.current?.close();
       landmarkerRef.current = null;
     };
