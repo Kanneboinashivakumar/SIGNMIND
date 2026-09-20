@@ -1,5 +1,5 @@
 # 🤟 SIGNMIND
-### AI-Powered Sign Language Movement Debugger & Interactive Learning Platform
+### Sign Language Movement Debugger & Interactive Learning Platform
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-signmind.vercel.app-00f5a0?style=for-the-badge&logo=vercel&logoColor=black)](https://signmind.vercel.app/)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&style=flat-square)](https://react.dev/)
@@ -7,34 +7,47 @@
 [![Vite](https://img.shields.io/badge/Vite-8.2-purple?logo=vite&style=flat-square)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&style=flat-square)](https://tailwindcss.com/)
 [![MediaPipe](https://img.shields.io/badge/MediaPipe-Tasks_Vision-brightgreen?logo=google&style=flat-square)](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
+[![Capacitor](https://img.shields.io/badge/Capacitor-Android-blueviolet?logo=capacitor&style=flat-square)](https://capacitorjs.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-**SIGNMIND** transforms sign language education from passive video watching into an interactive, camera-powered learning experience. Using real-time computer vision and 5-dimensional kinematic movement analysis, SIGNMIND acts as your personal biomechanical coach — evaluating hand shape, wrist orientation, spatial positioning, motion trajectory, and timing right inside your browser with zero specialized hardware.
+**SIGNMIND** is a camera-powered learning platform and movement debugger designed to bridge the practice-feedback gap in sign language education. Using browser-based computer vision and 5-dimensional kinematic analysis, SIGNMIND acts as a personalized movement coach — evaluating hand shape, palm orientation, spatial positioning, motion trajectory, and timing right from a standard camera with zero specialized hardware.
 
-🌐 **Try the Live Application**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)**
+🌐 **Try the Live Application**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)**  
+📱 **Android Application Package**: **`com.signmind.app`** (Capacitor Android)
 
 ---
 
 ## 📌 Problem Statement & The Gap
 
-Over 70 million deaf individuals worldwide rely on sign language, but learning it online is fundamentally broken:
+According to the **World Health Organization (WHO)**:
+- Over **1.5 billion people** worldwide live with some degree of hearing loss.
+- Approximately **430 million people** have disabling hearing loss requiring rehabilitation services.
+- The WHO projects this figure could exceed **700 million by 2050**.
 
-- **Passive & One-Way**: Watching YouTube videos or flipping flashcards offers zero feedback.
-- **Biomechanical Complexity**: Sign language is a 3D physical language. Without feedback, learners have no way of knowing if their finger curl is too tight, their wrist angle is reversed, or their spatial height is off.
-- **Black-Box AI**: Most existing computer vision demos provide a binary "Correct / Incorrect" score without explaining *why* you failed or *how* to correct your posture.
-- **Inaccessibility**: High-end motion capture gloves or private tutors are cost-prohibitive for the average student.
+Despite the critical need for inclusive communication, learning sign language independently presents a fundamental practice-feedback gap:
+
+- **The Feedback Void**: Watching an instructional video is easy, but knowing how to evaluate and improve your own physical execution is difficult. Learners cannot easily self-diagnose subtle joint mistakes.
+- **Biomechanical Complexity**: Sign language is a three-dimensional spatial language. A slight error in palm tilt, finger curl, or height alters the meaning of a sign.
+- **The Black-Box Classifier Problem**: Many experimental machine-learning demos output a simple binary classification ("Correct" or "Incorrect") without explaining *why* a sign was not recognized or *which* physical parameter was off.
+- **Hardware Barriers**: Traditional motion-capture solutions or specialized sensor gloves are cost-prohibitive for everyday learners.
 
 ---
 
 ## 💡 The SIGNMIND Solution
 
-**SIGNMIND** transforms sign language education into an accessible, camera-powered interactive experience:
+SIGNMIND establishes a structured, iterative learning loop:
 
-1. **Zero External Hardware**: Runs 100% in any modern web browser using a standard laptop or mobile webcam.
-2. **Kinematic Movement Debugger**: Deconstructs every attempt across 5 essential biomechanical dimensions rather than guessing with a black-box model.
-3. **Adaptive 70% Milestone Progression**: Requires verified $\ge 70\%$ accuracy to advance through sequential curriculum nodes.
-4. **SignDNA Biometric Profiling**: Aggregates continuous performance into a personalized muscle-memory radar chart.
-5. **Gamified Motivation**: Leveling, daily practice streaks, milestone trophies, cosmetic particle trails, and interactive scenario quests.
+$$\text{Learn} \longrightarrow \text{Practice} \longrightarrow \text{Analyze} \longrightarrow \text{Improve} \longrightarrow \text{Retry}$$
+
+### Key Differentiator
+Rather than acting as an opaque black-box classifier, **SIGNMIND decomposes every sign attempt into five transparent, actionable movement dimensions**. The system diagnoses the user's specific kinematic bottleneck and provides targeted micro-drills to refine muscle memory.
+
+### Technical Facts & Scope
+- **Camera-Based Vision**: Leverages Google MediaPipe Hand Landmarker to extract 21 3D hand keypoints in real time directly inside the browser or native webview.
+- **Deterministic Kinematic Evaluator**: Scoring is performed by a custom rule-based kinematic engine using 3D vector geometry, Euler joint angles, and Dynamic Time Warping (DTW) — not an uninterpretable deep-learning black box.
+- **Forward-Kinematic Mathematical Baselines**: Reference sign movements are modeled mathematically via canonical forward kinematics rather than uncurated crowd-sourced video sets.
+- **Single-Hand Curriculum**: The current version actively tracks and evaluates **one hand** (`numHands: 1`). Two-handed signing is planned for future releases.
+- **Client-Side Processing**: Camera video and landmark coordinates are processed locally on device. MediaPipe WASM and model binaries are fetched from a CDN on initial application load.
 
 ---
 
@@ -42,98 +55,131 @@ Over 70 million deaf individuals worldwide rely on sign language, but learning i
 
 ```mermaid
 flowchart TD
-    subgraph Input ["1. User & Camera Layer"]
-        A[Standard Webcam Stream] --> B[HTML5 Video Element]
-        B --> C["MediaPipe HandLandmarker<br/>(21 3D Joint Keypoints @ 30 FPS)"]
+    subgraph Input ["1. Video & Sensor Layer"]
+        A[Camera Stream / MediaDevices] --> B[HTML5 Video Element]
+        B --> C["MediaPipe HandLandmarker<br/>(21 3D Landmark Keypoints - Single Hand)"]
     end
 
-    subgraph Engine ["2. Kinematic & Biometric Engine"]
-        C --> D["Kinematic Normalizer<br/>(Mirror Invariant & Depth Calibrated)"]
-        D --> E1["Wrist Angles Engine<br/>(Yaw / Pitch / Roll)"]
-        D --> E2["Finger Curl Estimator<br/>(Thumb, Index, Mid, Ring, Pinky)"]
-        D --> E3["Trajectory Alignment<br/>(Relative Dynamic Time Warping - DTW)"]
+    subgraph Engine ["2. Kinematic Analysis Engine"]
+        C --> D["Spatial Normalizer<br/>(Mirror Invariant & Depth Calibrated)"]
+        D --> E1["Wrist Angles Engine<br/>(Yaw / Pitch / Roll via Normal Vectors)"]
+        D --> E2["Finger Curl Estimator<br/>(Thumb, Index, Middle, Ring, Pinky)"]
+        D --> E3["Trajectory Alignment<br/>(Dynamic Time Warping - DTW)"]
     end
 
-    subgraph Debugger ["3. Movement Debugger & Diagnostics"]
-        E1 & E2 & E3 --> F{"Biometric Evaluator (5 Metrics)"}
-        F --> G1["1. Hand Shape Score (0-100%)"]
-        F --> G2["2. Spatial Position Score (0-100%)"]
-        F --> G3["3. Wrist Orientation Score (0-100%)"]
-        F --> G4["4. Motion Trajectory Score (0-100%)"]
-        F --> G5["5. Execution Timing Score (0-100%)"]
+    subgraph Debugger ["3. 5-Dimension Movement Debugger"]
+        E1 & E2 & E3 --> F{"Kinematic Evaluator"}
+        F --> G1["1. Hand Shape Score (25%)"]
+        F --> G2["2. Spatial Position Score (20%)"]
+        F --> G3["3. Wrist Orientation Score (25%)"]
+        F --> G4["4. Motion Trajectory Score (18%)"]
+        F --> G5["5. Execution Timing Score (12%)"]
         
-        G1 & G2 & G3 & G4 & G5 --> H[Weighted Aggregate Score]
+        G1 & G2 & G3 & G4 & G5 --> H[Weighted Overall Movement Score]
     end
 
-    subgraph Flow ["4. Progression & Gamification State (Zustand)"]
-        H --> I{Score >= 70% ?}
-        I -- "< 70% (Miss)" --> J["Diagnostic Kinematic Coach Feedback<br/>(Identify Priority Issue + Retry)"]
-        I -- ">= 70% (Pass)" --> K["Milestone Clear! Confetti & Audio FX<br/>Unlock Next Lesson Node"]
+    subgraph Flow ["4. Progression & Guidance (Zustand Store)"]
+        H --> I{Score >= 70 ?}
+        I -- "Score < 70 (Miss)" --> J["Fix My Sign Feedback<br/>(Pinpoint Weakest Metric < 82 & Retry)"]
+        I -- "Score >= 70 (Pass)" --> K["Milestone Cleared!<br/>Unlock Next Sequential Node"]
         
-        K --> L["SignDNA Radar Matrix"]
-        K --> M["Hall of Mastery Trophies<br/>(Claim XP & Gems)"]
+        K --> L["SignDNA Movement Profile<br/>(Performance Radar Matrix)"]
+        K --> M["Hall of Mastery<br/>(Claim XP & Achievements)"]
         K --> N["Curriculum Progression<br/>(HELLO -> THANK YOU -> PLEASE -> SORRY -> YES -> NO)"]
     end
 
-    subgraph UI ["5. Presentation Layer"]
-        J & K --> O["Camera Studio & Live Skeletal HUD"]
-        N --> P["Journey Map & Interactive Quests"]
-        L --> Q["SignDNA & Analytics Dashboard"]
+    subgraph UI ["5. Dual-Platform Interface"]
+        J & K --> O["Practice Studio & Skeletal Canvas HUD"]
+        N --> P["Journey Map (Vertical Progression)"]
+        L --> Q["SignDNA Performance Dashboard"]
         M --> R["Profile & Cosmetic Trail Wardrobe"]
     end
 ```
 
 ---
 
-## ✨ Core Features
+## 📚 Active Curriculum (6 Beginner Signs)
+
+SIGNMIND features a sequenced six-sign beginner curriculum focusing on everyday conversational ASL fundamentals:
+
+| Order | Sign | Phonetic | Primary Movement Pattern |
+| :---: | :--- | :--- | :--- |
+| **1** | **HELLO** | `/həˈloʊ/` | Open hand near temple, smooth outward lateral trajectory |
+| **2** | **THANK YOU** | `/θæŋk juː/` | Flat hand moving forward and down from chin |
+| **3** | **PLEASE** | `/pliːz/` | Flat hand in circular motion against chest plane |
+| **4** | **SORRY** | `/ˈsɑːri/` | Closed fist circular rubbing motion on chest |
+| **5** | **YES** | `/jɛs/` | S-fist tilting up and down from wrist (nodding motion) |
+| **6** | **NO** | `/noʊ/` | Index and middle fingers snapping down onto thumb |
+
+---
+
+## 📐 5-Dimension Movement Scoring
+
+Rather than guessing with a black-box classification score, SIGNMIND evaluates attempts across five distinct biomechanical dimensions:
+
+| Dimension | Weight | Mathematical Basis | Description |
+| :--- | :---: | :--- | :--- |
+| **Hand Shape** | **25%** | Joint curl ratios & inter-digit spacing | Extension and curl of all 5 digits relative to canonical reference posture. |
+| **Spatial Position** | **20%** | Euclidean distance relative to anchor | Coordinates of the wrist/hand relative to the face and torso frame. |
+| **Wrist Orientation** | **25%** | 3D normal vector dot product | Real-time Yaw, Pitch, and Roll angles calculated from palm normal vectors. |
+| **Motion Trajectory** | **18%** | Dynamic Time Warping (DTW) distance | Shape and direction of the movement path compared to the canonical path. |
+| **Execution Timing** | **12%** | Phase progression velocity & tempo | Speed consistency, pauses, and overall execution rhythm over time. |
+
+### Scoring & Feedback Thresholds
+- **Passing Threshold ($\text{Score} \ge 70$)**: Requires a composite score of 70 or higher to clear a lesson node and unlock the next sign.
+- **Coaching & Diagnosis Threshold ($\text{Score} < 82$)**: If the weakest dimension scores below 82, the system flags it as the primary divergence point and generates targeted coaching advice. If all metrics are $\ge 82$, the system confirms balanced technical execution.
+> *Note: These values are calibrated scoring thresholds, not statistical accuracy percentages.*
+
+---
+
+## ✨ Implemented Features
 
 ### 1. 🎥 Watch & Learn Stage
-Before camera capture begins, learners watch isolated, authentic video demonstration clips cut specifically for each sign (`HELLO`, `THANK YOU`, `PLEASE`, `SORRY`, `YES`, `NO`). Numbered anatomical cues walk the learner through hand posture and orientation.
+Prior to camera capture, learners review isolated, canonical video demonstration clips cut specifically for each sign (`HELLO`, `THANK YOU`, `PLEASE`, `SORRY`, `YES`, `NO`). Numbered anatomical cues walk the learner through hand posture and orientation.
 
-### 2. 🚦 Dynamic Camera Readiness & Pre-Flight Check
-Before entering practice mode, SIGNMIND performs real-time pre-flight checks on lighting, camera framing, and hand tracking stability to ensure ideal recording conditions before user attempts begin.
+### 2. 🚦 Advisory Camera Readiness Check
+An integrated pre-flight status card monitors video stream availability, MediaPipe engine initialization, hand presence in the frame, and advisory positioning guidelines to assist the learner prior to recording.
 
-### 3. ⚡ Real-Time Camera Studio & 21-Point Skeletal HUD
-Once in practice mode, SIGNMIND renders an interactive skeletal hand overlay across 21 MediaPipe landmark vectors with smooth, real-time performance (~30 FPS).
+### 3. ⚡ Camera Practice Studio & 21-Point Skeletal HUD
+Once in practice mode, the studio renders an interactive skeletal overlay across all 21 landmark vectors with mirrored coordinates aligned to the video feed.
 
-### 4. 🩺 The 5-Dimension Movement Debugger
-Deconstructs every attempt across five biomechanical dimensions:
-- **Hand Shape (25%)**: Finger curls and extension across all five digits.
-- **Spatial Position (20%)**: Hand coordinates relative to the face and torso.
-- **Wrist Orientation (25%)**: Real-time Yaw, Pitch, and Roll angles.
-- **Motion Trajectory (18%)**: Dynamic Time Warping (DTW) path alignment against canonical references.
-- **Execution Timing (12%)**: Cadence, rhythm, and motion duration.
+### 4. 🩺 5-Dimension Movement Debugger
+Real-time and post-attempt telemetry displays broken-down scores for Hand Shape, Position, Orientation, Trajectory, and Timing.
 
-### 5. 🎯 Fix My Sign — Focused Micro-Drills
-When an attempt falls short or reveals a specific weak dimension (<82%), the system pinpoints the weakest metric, provides actionable kinematic coaching instructions, and lets the user run a focused retry drill. When all metrics are $\ge 82\%$, it celebrates technical mastery.
+### 5. 🎯 Fix My Sign — Corrective Micro-Drills
+Identifies the single weakest metric below 82, provides actionable movement advice, and allows the learner to immediately execute a focused retry.
 
-### 6. 📊 Before vs After Attempt Comparison
-Learners can compare their latest attempt against their previous attempt side-by-side, visualizing metric deltas (+/- score changes) to track muscle memory progress over time.
+### 6. 📊 Before vs. After Attempt Comparison
+Compares the learner's latest attempt with their immediately preceding attempt on the **same sign**, visualizing score deltas (+/- changes) to track muscle-memory progression.
 
-### 7. 🧬 SignDNA Profile & Biometric Radar
-Aggregates continuous practice telemetry into a 5-axis kinematic radar chart, identifying natural biomechanical strengths and pinpointing dimensions needing calibration.
+### 7. 🧬 SignDNA Movement Profile
+Aggregates cumulative attempt telemetry into a 5-axis **Movement Performance Radar**, highlighting natural mechanical strengths and identifying dimensions requiring practice. *(This is an educational performance summary, not biometric identification).*
 
-### 8. 🏆 Mastery Progression & Gamification
-- **70% Passing Threshold**: Clear progression requirements to advance through sequential curriculum nodes.
-- **Mastery Journey**: Climb elevation on Mastery Mountain with daily practice streaks.
-- **Claimable Trophies**: Unlock achievements (e.g., *First Sign Cleared*, *Kinematic Master*) to earn XP and Gems.
-- **Cosmetic Wardrobe**: Equip custom hand particle trails (Neon Mint, Electric Violet, Medic Pulse, Solar Plasma).
-- **1-Click Pitch Reset**: A dedicated `RESET DEMO` button in the header resets the curriculum to `HELLO` for demonstration purposes.
+### 8. 🏆 Leveling, Streaks, Trophies & Cosmetic Trails
+- **Elevation Progression**: Advance up Mastery Mountain by clearing lesson nodes.
+- **Hall of Mastery Trophies**: Unlock achievements (*First Sign Cleared*, *Kinematic Master*, etc.) to claim XP and Gems.
+- **Cosmetic Wardrobe**: Equip custom hand trail effects (Neon Mint, Electric Violet, Medic Pulse, Solar Plasma).
+- **Pitch Reset**: A dedicated `RESET DEMO` button resets progress to `HELLO` for demonstration purposes.
+
+### 9. 📱 Unified Dual-Platform Experience (Web + Android)
+A single shared React + TypeScript codebase delivers both a responsive web application and an installable native Android package (`com.signmind.app`) via Capacitor.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Domain | Technology | Purpose |
+| Category | Technologies | Purpose |
 | :--- | :--- | :--- |
-| **Framework** | React 19 + TypeScript | Strict typing, reactive state, component modularity |
-| **Build Tool** | Vite 8 | Sub-second HMR, optimized production rollup |
-| **Styling** | Tailwind CSS | Modern cybernetic dark-mode UI with fluid layouts |
-| **Computer Vision** | Google MediaPipe Tasks-Vision | In-browser 21 3D hand landmark detection |
-| **Kinematic Engine** | Custom Vector Math + DTW | 3D Euler angles, finger curl geometry, dynamic time warping |
-| **State Management**| Zustand | Lightweight persisted store with localStorage syncing |
-| **Audio Engine** | Web Audio API | Low-latency synthesized biometric audio feedback |
-| **FX & Animation** | Canvas-Confetti + CSS | Reward particle systems and HUD glow animations |
+| **Frontend Framework** | React 19, TypeScript, Vite 8 | Reactive component tree, strict type safety, fast build cycles |
+| **Styling & Layout** | Tailwind CSS | Dark cybernetic theme, responsive mobile & desktop viewport layouts |
+| **Computer Vision** | Google MediaPipe Tasks-Vision | In-browser 21 3D hand landmark detection (single-hand mode) |
+| **Movement Analysis** | Custom Vector Math & DTW | 3D Euler angles, joint-curl geometry, Dynamic Time Warping path alignment |
+| **Scoring & Feedback** | Deterministic Kinematic Engine | 5-dimension weighted scoring and rule-based diagnostic coaching |
+| **Camera & Video** | MediaDevices API, HTML5 Video | Webcam capture, mirrored video display, autoplay stream management |
+| **State & Storage** | Zustand, Browser LocalStorage | Offline-first persisted user progress, streak counting, attempt history |
+| **Audio Engine** | Web Audio API | Low-latency synthesized sound cues for countdown, pass, and fail events |
+| **Mobile Packaging** | Capacitor 7, Android SDK, Gradle | Native Android application wrapper (`com.signmind.app`) with hardware acceleration |
+| **Deployment** | Vercel, GitHub | Continuous deployment for live web application and repository tracking |
 
 ---
 
@@ -141,56 +187,60 @@ Aggregates continuous practice telemetry into a 5-axis kinematic radar chart, id
 
 ```
 SIGNMIND/
+├── android/                      # Native Android Capacitor wrapper project
+│   ├── app/
+│   │   ├── src/main/
+│   │   │   ├── AndroidManifest.xml # Permissions (CAMERA, INTERNET, hardware acceleration)
+│   │   │   └── java/com/signmind/app/MainActivity.java # WebView media settings
+│   │   └── build.gradle          # App build configuration (Java 17, SDK 34+)
+│   └── build.gradle              # Top-level Gradle configuration
 ├── public/
 │   ├── emblem.svg                # Brand emblem
 │   ├── favicon.svg               # Web favicon
-│   ├── manifest.json             # PWA manifest
-│   ├── sw.js                     # Service worker
+│   ├── manifest.json             # Web App Manifest
+│   ├── sw.js                     # Service Worker
 │   └── videos/
-│       ├── SL.mp4                # Source video for Restaurant Quest
-│       └── clips/                # Standalone cut clips per sign
-│           ├── HELLO.mp4
-│           ├── NO.mp4
-│           ├── PLEASE.mp4
-│           ├── SORRY.mp4
-│           ├── THANK_YOU.mp4
-│           └── YES.mp4
+│       ├── SL.mp4                # Source video reference
+│       └── clips/                # Cut clips for each sign (HELLO, NO, PLEASE, SORRY, THANK_YOU, YES)
 ├── src/
 │   ├── components/
-│   │   ├── AttemptComparison.tsx # Before vs After attempt metric diffing
-│   │   ├── BottomNav.tsx         # Mobile navigation bar
-│   │   ├── CameraReadinessCard.tsx # Pre-flight camera readiness checklist
-│   │   ├── FixMySignCard.tsx     # Corrective micro-drills for weakest metric
-│   │   ├── Header.tsx            # Top nav, audio toggle, RESET DEMO, XP widget
-│   │   ├── HomeDashboard.tsx     # Hero overview & daily quest gateway
-│   │   ├── JourneyMap.tsx        # Visual node-based sign progression path
-│   │   ├── MetricComparisonRow.tsx # Metric breakdown comparison rows
-│   │   ├── MissionsView.tsx      # Multi-phrase conversational scenario challenges
-│   │   ├── PracticeStudio.tsx    # Core camera workspace, debugger, modal
+│   │   ├── AttemptComparison.tsx # Side-by-side Before vs. After metric diffing
+│   │   ├── BottomNav.tsx         # 5-tab mobile navigation with safe-area padding
+│   │   ├── CameraReadinessCard.tsx # Pre-flight advisory camera checklist
+│   │   ├── FixMySignCard.tsx     # Corrective micro-drills for weakest metric (<82)
+│   │   ├── Header.tsx            # Desktop header with audio toggle, reset demo, XP widget
+│   │   ├── HomeDashboard.tsx     # Mobile-first dashboard with streak, level, continue CTA
+│   │   ├── JourneyMap.tsx        # Vertical 6-node progression path with lock states
+│   │   ├── MetricComparisonRow.tsx # Individual metric delta comparison rows
+│   │   ├── MissionsView.tsx      # Scenario challenges and checklist progress
+│   │   ├── PracticeStudio.tsx    # Core camera workspace, tabbed mobile view, results modal
 │   │   ├── ProfileView.tsx       # Trophies, trail wardrobe, altitude tracking
-│   │   ├── SignDNAView.tsx       # Biometric analytics & radar chart
-│   │   ├── VideoReferencePlayer.tsx # Embedded tutorial video player
-│   │   └── WatchLearnStage.tsx   # Step 1 video introduction & anatomical guide
+│   │   ├── SignDNAView.tsx       # SignDNA Movement Profile & 5-axis radar chart
+│   │   ├── VideoReferencePlayer.tsx # Video playback controller
+│   │   └── WatchLearnStage.tsx   # Video introduction & anatomical guide
 │   ├── data/
-│   │   └── signCatalog.ts        # Canonical ASL FK landmarks, timing & metadata
+│   │   └── signCatalog.ts        # 6-sign curriculum, phonetic data & canonical frames
 │   ├── hooks/
-│   │   └── usePracticeEngine.ts  # MediaPipe webcam loop, scoring, live metrics
+│   │   └── usePracticeEngine.ts  # Single RAF loop, MediaPipe detection, live scoring
 │   ├── store/
-│   │   ├── progress.ts           # Streak and lesson calculation utilities
-│   │   └── useSignMindStore.ts   # Zustand root store with persistent state
+│   │   ├── progress.ts           # Lesson status, streak calculations & DNA utilities
+│   │   └── useSignMindStore.ts   # Zustand root store with persistent LocalStorage syncing
+│   ├── utils/
+│   │   └── audio.ts              # Web Audio API sound synthesizer
 │   ├── vision/
-│   │   ├── coach.ts              # Biomechanical coaching templates
-│   │   ├── diagnosis.ts          # Priority issue divergence analysis
-│   │   ├── drawHand.ts           # Canvas skeletal rendering & visual cues
-│   │   ├── dtw.ts                # Dynamic Time Warping trajectory comparison
-│   │   ├── geometry.ts           # Vector math, Euclidean distance, normal vectors
+│   │   ├── coach.ts              # Rule-based coaching advice templates
+│   │   ├── diagnosis.ts          # Priority divergence point calculation
+│   │   ├── drawHand.ts           # Canvas skeletal drawing & joint connection paths
+│   │   ├── dtw.ts                # Dynamic Time Warping sequence alignment
+│   │   ├── geometry.ts           # 3D vector math, Euler wrist angles, finger curl geometry
 │   │   ├── handModel.ts          # Forward kinematics canonical hand constructor
-│   │   ├── handTracker.ts        # MediaPipe landmarker initialization & detection
-│   │   ├── scoring.ts            # 5-metric comparison and tolerance algorithms
-│   │   └── types.ts              # Landmark, metric score, and sign type definitions
-│   ├── App.tsx                   # Main dynamic layout router
-│   ├── index.css                 # Custom font definitions and cybernetic tokens
-│   └── main.tsx                  # Application mount
+│   │   ├── handTracker.ts        # MediaPipe HandLandmarker initialization
+│   │   ├── scoring.ts            # 5-metric tolerance and scoring algorithms
+│   │   └── types.ts              # MetricScores, LandmarkFrame, and threshold constants
+│   ├── App.tsx                   # Main layout container & tab routing
+│   ├── index.css                 # Custom font definitions, styling tokens
+│   └── main.tsx                  # Application entry point
+├── capacitor.config.ts           # Capacitor configuration (appId: com.signmind.app)
 ├── package.json
 ├── tailwind.config.js
 ├── tsconfig.json
@@ -203,7 +253,7 @@ SIGNMIND/
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18.0.0 or higher recommended)
-- Modern web browser with webcam access (Chrome, Edge, Safari, Firefox)
+- Modern web browser with webcam access (Chrome, Edge, Firefox, Safari)
 
 ### 1. Clone the repository
 ```bash
@@ -220,54 +270,70 @@ npm install
 ```bash
 npm run dev
 ```
-Open **`http://localhost:5173`** in your browser. Grant camera permissions when prompted.
+Open **`http://localhost:5173`** in your browser and allow camera permissions when prompted.
 
 ### 4. Build for production (Web)
 ```bash
 npm run build
 ```
-Generates an optimized production bundle in the `dist/` folder.
+Generates an optimized production bundle in the `dist/` directory.
 
 ---
 
 ## 📱 Mobile & Android Native Application
 
-SIGNMIND delivers a unified dual-platform experience using a single shared React + TypeScript + Vite codebase:
-- **Responsive Web Application**: Works on any modern mobile and desktop browser.
-- **Installable Android Application**: Packaged using Capacitor (`com.signmind.app`) with full hardware camera access and safe-area notch layout support.
+SIGNMIND packages the same React codebase into an Android application via Capacitor:
+- **Package ID**: `com.signmind.app`
+- **Application Name**: `SIGNMIND`
+- **Hardware Acceleration**: Enabled for smooth camera and canvas rendering.
 
 ### Android Prerequisites
 - [Android Studio](https://developer.android.com/studio) (Giraffe or newer)
 - Android SDK (API 34+)
 - Java 17 LTS
 
-### Running on Android
+### Building & Running Android
 ```bash
-# 1. Build web distribution
+# 1. Build the web production assets
 npm run build
 
-# 2. Sync web assets & plugins to native Android
+# 2. Sync web assets and plugins to the Android project
 npx cap sync android
 
-# 3. Open project in Android Studio
+# 3. Open in Android Studio
 npx cap open android
 
-# Or build debug APK directly from command line:
+# Or build the debug APK directly from the command line:
 cd android && ./gradlew assembleDebug
 ```
-The compiled debug APK will be located at:
-`android/app/build/outputs/apk/debug/app-debug.apk`
+
+The compiled debug APK is located at:
+```
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Testing Options for Evaluators
+1. **Direct Web Access**: Open [https://signmind.vercel.app/](https://signmind.vercel.app/) in Chrome or Edge (no installation needed).
+2. **Physical Android Device**: Install `app-debug.apk` directly on an Android smartphone.
+3. **PC / Mac via Emulator (e.g. BlueStacks)**:
+   - Drag and drop `app-debug.apk` into BlueStacks.
+   - Ensure the laptop webcam is selected in *BlueStacks Settings → Devices → Camera*.
 
 ---
 
 ## 🔮 Future Roadmap
 
-- [ ] **Real-World Reward Economy**: Convert accumulated XP / Gems (e.g. at 1,000 XP) into partner coupons, gift cards, and educational vouchers.
-- [ ] **Two-Handed Dialogue AI**: Extend kinematics to multi-sign conversational scenarios with full sentence parsing.
-- [ ] **Multilingual Sign Catalogs**: Support for Indian Sign Language (ISL) and British Sign Language (BSL).
-- [ ] **Offline PWA Installation**: Full offline caching of MediaPipe WASM models for low-bandwidth environments.
+The following features represent planned enhancements beyond the current prototype:
+
+1. **Expand Sign Library**: Grow from the 6 core beginner signs to 50+ signs spanning intermediate and advanced conversational tiers.
+2. **Advanced Recognition & Two-Handed Gestures**: Extend the kinematic engine to support dual-hand signs (`numHands: 2`), facial expressions, and continuous multi-sign phrases.
+3. **Personalized Learning Paths**: Leverage accumulated attempt history to dynamically generate custom practice routines based on individual learning curves.
+4. **Long-Term Learning Analytics**: Track historical movement trends to analyze muscle-memory retention and persistent mechanical habits over time.
+5. **Wider Accessibility & Offline WASM**: Implement comprehensive offline caching for MediaPipe model binaries to enable practice in low-connectivity environments.
+6. **Global Sign Language Support**: Expand curriculum models toward Indian Sign Language (ISL), British Sign Language (BSL), and collaborate with educators and accessibility organizations.
 
 ---
 
 ## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
+
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
