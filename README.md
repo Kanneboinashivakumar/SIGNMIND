@@ -2,6 +2,7 @@
 ### Sign Language Movement Debugger & Interactive Learning Platform
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-signmind.vercel.app-00f5a0?style=for-the-badge&logo=vercel&logoColor=black)](https://signmind.vercel.app/)
+[![Download Android APK](https://img.shields.io/badge/Download_APK-v1.0.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kanneboinashivakumar/SIGNMIND/releases)
 [![React](https://img.shields.io/badge/React-19.2-blue?logo=react&style=flat-square)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript&style=flat-square)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-purple?logo=vite&style=flat-square)](https://vitejs.dev/)
@@ -13,7 +14,7 @@
 **SIGNMIND** is a camera-powered learning platform and movement debugger designed to bridge the practice-feedback gap in sign language education. Using browser-based computer vision and 5-dimensional kinematic analysis, SIGNMIND acts as a personalized movement coach — evaluating hand shape, palm orientation, spatial positioning, motion trajectory, and timing right from a standard camera with zero specialized hardware.
 
 🌐 **Try the Live Application**: **[https://signmind.vercel.app/](https://signmind.vercel.app/)**  
-📱 **Android Application Package**: **`com.signmind.app`** (Capacitor Android)
+📱 **Download Android APK**: **[SIGNMIND v1.0.0 Release (Direct APK Download)](https://github.com/Kanneboinashivakumar/SIGNMIND/releases)** (`com.signmind.app`)
 
 ---
 
@@ -312,12 +313,25 @@ The compiled debug APK is located at:
 android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### Testing Options for Evaluators
-1. **Direct Web Access**: Open [https://signmind.vercel.app/](https://signmind.vercel.app/) in Chrome or Edge (no installation needed).
-2. **Physical Android Device**: Install `app-debug.apk` directly on an Android smartphone.
-3. **PC / Mac via Emulator (e.g. BlueStacks)**:
-   - Drag and drop `app-debug.apk` into BlueStacks.
-   - Ensure the laptop webcam is selected in *BlueStacks Settings → Devices → Camera*.
+### 📥 Download & Testing Options for Evaluators
+
+👉 **[Download Pre-Compiled Android APK (v1.0.0)](https://github.com/Kanneboinashivakumar/SIGNMIND/releases/latest)**
+
+1. **Direct Web Access (Instant, Recommended)**:
+   - Open **[https://signmind.vercel.app/](https://signmind.vercel.app/)** in any modern web browser (Google Chrome, Microsoft Edge, Brave, or Safari).
+   - Allow camera permissions and start practicing immediately — zero installation required!
+
+2. **Physical Android Device**:
+   - Download the APK from the [GitHub Releases (v1.0.0)](https://github.com/Kanneboinashivakumar/SIGNMIND/releases/latest) tab (`app-debug.apk`).
+   - Transfer or download directly to your Android device (Android 8.0+ supported).
+   - Tap to install (enable "Install from Unknown Sources" if prompted).
+   - Grant camera permissions when launching the app.
+
+3. **PC / Mac via Android Emulator (e.g. BlueStacks, Nox)**:
+   - Download the pre-compiled `app-debug.apk` from the latest release.
+   - Drag and drop `app-debug.apk` into BlueStacks / your emulator window.
+   - Ensure your PC webcam is enabled and mapped in *BlueStacks Settings → Devices → Camera*.
+   - Launch SIGNMIND and test the camera tracking in full mobile layout.
 
 ---
 
